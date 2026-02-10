@@ -118,11 +118,12 @@ class HomeViewModel(
                 }
 
                 _snackBarChannel.send("Word posted successfully")
-            }.onError { networkError, e ->
+            }.onError { networkError, message ->
+                _snackBarChannel.send(message ?: networkError.name)
                 _state.update {
                     it.copy(isSubmitInProgress = false)
                 }
-                Napier.v("Failed login $networkError, $e")
+
             }
         }
     }

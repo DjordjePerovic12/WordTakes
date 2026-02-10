@@ -14,6 +14,7 @@ import com.bokadev.word_takes.domain.repository.DataStoreRepository
 import com.bokadev.word_takes.presentation.login.LoginEvent
 import com.bokadev.word_takes.presentation.login.LoginState
 import io.github.aakira.napier.Napier
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -36,6 +38,9 @@ class RegisterViewModel(
     private var hasLoadedInitialData = false
 
     private val _state = MutableStateFlow(RegisterState())
+
+    private val _snackBarChannel = Channel<String>()
+    val snackBarChannel = _snackBarChannel.receiveAsFlow()
 
     val state = _state
         .onStart {
@@ -137,8 +142,8 @@ class RegisterViewModel(
                 navigator.navigateTo(Screen.HomeScreen)
 
             }
-                .onError { networkError, e ->
-                    Napier.v("Failed login $networkError, $e")
+                .onError { networkError, message ->
+                    _snackBarChannel.send(message ?: networkError.name)
                 }
         }
     }

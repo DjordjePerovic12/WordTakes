@@ -7,4 +7,8 @@ interface DataStoreRepository {
 
     fun observeAuthInfo(): Flow<AuthInfo?>
     suspend fun set(info: AuthInfo?)
+
+    suspend fun getAuthInfoOrNull(): AuthInfo?
+
+    suspend fun getAccessTokenOrEmpty(): String
 }

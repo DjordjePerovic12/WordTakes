@@ -23,13 +23,20 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 @Preview
 fun AppComposable(
-    viewModel: MainViewModel = koinViewModel()
+    viewModel: MainViewModel = koinViewModel(),
+    onAuthenticationChecked: () -> Unit = {}
 ) {
     val navigator = koinInject<Navigator>()
 
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    val startDestination = if(state.isLoggedIn) Screen.HomeScreen else Screen.LoginScreen
+    val startDestination = if (state.isLoggedIn) Screen.HomeScreen else Screen.LoginScreen
+
+    LaunchedEffect(state.isCheckingAuth) {
+        if (!state.isCheckingAuth) {
+            onAuthenticationChecked()
+        }
+    }
 
     MaterialTheme {
         val appState = rememberAppState()
@@ -42,15 +49,16 @@ fun AppComposable(
                 CustomModifiers.snackBarHost(appState.scaffoldState)
             }
         ) {
-            BaseAppNavigation(
-                navigator = navigator,
-                navController = appState.navController,
-                startDestination = startDestination,
-                showSnackBar = { message ->
-                    Napier.v(message, null, "SNACKBAR")
-                    appState.showSnackBar(message)
-                }
-            )
+            if (!state.isCheckingAuth)
+                BaseAppNavigation(
+                    navigator = navigator,
+                    navController = appState.navController,
+                    startDestination = startDestination,
+                    showSnackBar = { message ->
+                        Napier.v(message, null, "SNACKBAR")
+                        appState.showSnackBar(message)
+                    }
+                )
         }
     }
 }

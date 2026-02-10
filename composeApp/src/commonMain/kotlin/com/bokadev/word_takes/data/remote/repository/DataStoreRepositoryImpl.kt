@@ -10,6 +10,7 @@ import com.bokadev.word_takes.data.remote.mapper.toSerializable
 import com.bokadev.word_takes.domain.model.AuthInfo
 import com.bokadev.word_takes.domain.repository.DataStoreRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
 
@@ -46,4 +47,10 @@ class DataStoreRepositoryImpl(
         }
 
     }
+
+    override suspend fun getAuthInfoOrNull(): AuthInfo? =
+        observeAuthInfo().first()
+
+    override suspend fun getAccessTokenOrEmpty(): String =
+        observeAuthInfo().first()?.token.orEmpty()
 }

@@ -73,12 +73,8 @@ fun provideKtorClient(
         install(Auth) {
             bearer {
                 loadTokens {
-                    // Load your tokens here
-                    BearerTokens(
-                        accessToken = dataStoreRepository.observeAuthInfo()
-                            .firstOrNull()?.token ?: "",//localStorage.getAccessToken(),
-                        refreshToken = ""//localStorage.getRefreshToken()
-                    )
+                    val token = dataStoreRepository.getAccessTokenOrEmpty()
+                    if (token.isBlank()) null else BearerTokens(token, "")
                 }
 
 //                refreshTokens {

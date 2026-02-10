@@ -13,6 +13,7 @@ import com.bokadev.word_takes.data.remote.services.KtorApiService
 import com.bokadev.word_takes.domain.repository.AuthRepository
 import com.bokadev.word_takes.domain.repository.DataStoreRepository
 import io.github.aakira.napier.Napier
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -36,6 +38,9 @@ class LoginViewModel(
     private var hasLoadedInitialData = false
 
     private val _state = MutableStateFlow(LoginState())
+
+    private val _snackBarChannel = Channel<String>()
+    val snackBarChannel = _snackBarChannel.receiveAsFlow()
 
     val state = _state
         .onStart {
@@ -126,8 +131,8 @@ class LoginViewModel(
                 navigator.navigateTo(Screen.HomeScreen)
 
             }
-                .onError { networkError, e ->
-                    Napier.v("Failed login $networkError, $e")
+                .onError { networkError, message ->
+                    _snackBarChannel.send(message ?: networkError.name)
                 }
         }
     }

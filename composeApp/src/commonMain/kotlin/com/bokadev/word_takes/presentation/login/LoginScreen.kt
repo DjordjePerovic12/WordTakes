@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bokadev.word_takes.core.components.WordTakesTextField
 import com.bokadev.word_takes.core.utils.noRippleClickable
+import com.bokadev.word_takes.core.utils.observeWithLifecycle
 import llc.amplitudo.cerovo.ui.theme.WordTakesTheme
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
@@ -56,6 +57,11 @@ fun LoginScreen(
 ) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
+
+    viewModel.snackBarChannel.observeWithLifecycle { message ->
+        showSnackBar(message)
+    }
+
     Column(
         verticalArrangement = Arrangement.spacedBy(20.dp, alignment = Alignment.Top),
         horizontalAlignment = Alignment.CenterHorizontally,
