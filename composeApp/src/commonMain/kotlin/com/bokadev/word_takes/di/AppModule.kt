@@ -11,6 +11,7 @@ import com.bokadev.word_takes.data.remote.services.KtorApiService
 import com.bokadev.word_takes.domain.repository.AuthRepository
 import com.bokadev.word_takes.domain.repository.DataStoreRepository
 import com.bokadev.word_takes.presentation.login.LoginViewModel
+import com.bokadev.word_takes.presentation.register.RegisterViewModel
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
@@ -27,6 +28,7 @@ val appModule = module {
     includes(platformAppModule)
     viewModelOf(::LoginViewModel)
     viewModelOf(::MainViewModel)
+    viewModelOf(::RegisterViewModel)
     singleOf(::KtorApiService) bind ApiService::class
     singleOf(::AuthRepositoryImpl) bind AuthRepository::class
     singleOf(::DataStoreRepositoryImpl) bind DataStoreRepository::class

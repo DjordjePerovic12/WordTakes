@@ -1,12 +1,12 @@
 package com.bokadev.word_takes.data.remote.mapper
 
-import com.bokadev.word_takes.data.remote.dto.LoginResponseDto
+import com.bokadev.word_takes.data.remote.dto.AuthInfoResponseDto
 import com.bokadev.word_takes.data.remote.dto.UserDto
-import com.bokadev.word_takes.domain.model.LoginResponse
+import com.bokadev.word_takes.domain.model.AuthInfo
 import com.bokadev.word_takes.domain.model.User
 
-fun LoginResponseDto.toDomain(): LoginResponse {
-    return LoginResponse(
+fun AuthInfoResponseDto.toDomain(): AuthInfo {
+    return AuthInfo(
         user = user.toDomain(),
         token = token
     )
@@ -20,8 +20,8 @@ fun UserDto.toDomain(): User {
     )
 }
 
-fun LoginResponse.toSerializable(): LoginResponseDto {
-    return LoginResponseDto(
+fun AuthInfo.toSerializable(): AuthInfoResponseDto {
+    return AuthInfoResponseDto(
         user = user.toSerializable(),
         token = token
     )

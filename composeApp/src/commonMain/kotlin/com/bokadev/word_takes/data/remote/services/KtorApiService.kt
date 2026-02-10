@@ -4,11 +4,10 @@ import com.bokadev.word_takes.core.networking.NetworkError
 import com.bokadev.word_takes.core.networking.Resource
 import com.bokadev.word_takes.core.networking.addParams
 import com.bokadev.word_takes.core.networking.addQueryParams
-import com.bokadev.word_takes.core.networking.map
 import com.bokadev.word_takes.core.networking.responseToResource
 import com.bokadev.word_takes.data.remote.dto.LoginRequestDto
-import com.bokadev.word_takes.data.remote.dto.LoginResponseDto
-import com.bokadev.word_takes.domain.model.LoginResponse
+import com.bokadev.word_takes.data.remote.dto.AuthInfoResponseDto
+import com.bokadev.word_takes.data.remote.dto.RegisterRequestDto
 import io.ktor.client.HttpClient
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
@@ -99,10 +98,18 @@ class KtorApiService(
 //    private fun sendWSMessage() {}
 //    private fun readWSMessage() {}
 
-    override suspend fun login(loginRequestDto: LoginRequestDto): Resource<LoginResponseDto, NetworkError, String?> {
+    override suspend fun login(loginRequestDto: LoginRequestDto): Resource<AuthInfoResponseDto, NetworkError, String?> {
         return post(
             path = "/api/login",
             body = loginRequestDto
+        )
+    }
+
+
+    override suspend fun register(registerRequestDto: RegisterRequestDto): Resource<AuthInfoResponseDto, NetworkError, String?> {
+        return post(
+            path = "/api/register",
+            body = registerRequestDto
         )
     }
 
