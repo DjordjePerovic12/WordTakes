@@ -71,7 +71,6 @@ fun WordTakesTextField(
                 .onFocusChanged { focusState ->
                     onFocusChanged?.invoke(focusState.isFocused)
                 }
-                .fillMaxWidth()
                 .border(
                     width = 1.dp,
                     color = if (isError) WordTakesTheme.colors.errorRed else WordTakesTheme.colors.wordTakesWhite,

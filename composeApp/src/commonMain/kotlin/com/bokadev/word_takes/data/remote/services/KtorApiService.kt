@@ -7,6 +7,7 @@ import com.bokadev.word_takes.core.networking.addQueryParams
 import com.bokadev.word_takes.core.networking.responseToResource
 import com.bokadev.word_takes.data.remote.dto.LoginRequestDto
 import com.bokadev.word_takes.data.remote.dto.AuthInfoResponseDto
+import com.bokadev.word_takes.data.remote.dto.PostTakeRequestDto
 import com.bokadev.word_takes.data.remote.dto.RegisterRequestDto
 import io.ktor.client.HttpClient
 import io.ktor.client.request.delete
@@ -110,6 +111,13 @@ class KtorApiService(
         return post(
             path = "/api/register",
             body = registerRequestDto
+        )
+    }
+
+    override suspend fun postTake(postTakeRequestDto: PostTakeRequestDto): Resource<Unit, NetworkError, String?> {
+        return post(
+            path = "/api/words",
+            body = postTakeRequestDto
         )
     }
 

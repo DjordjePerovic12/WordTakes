@@ -2,6 +2,7 @@ package com.bokadev.word_takes.data.remote
 
 import com.bokadev.word_takes.BuildKonfig
 import com.bokadev.word_takes.core.navigation.utils.Navigator
+import com.bokadev.word_takes.domain.repository.DataStoreRepository
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
@@ -21,12 +22,14 @@ import io.ktor.client.request.header
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.serialization.json.Json
 import kotlin.time.Duration.Companion.seconds
 
 fun provideKtorClient(
 //    localStorage : LocalStorageRepository,
-    navigator: Navigator
+    navigator: Navigator,
+    dataStoreRepository: DataStoreRepository,
 ): HttpClient {
 
     val client = HttpClient {
@@ -72,7 +75,8 @@ fun provideKtorClient(
                 loadTokens {
                     // Load your tokens here
                     BearerTokens(
-                        accessToken = "",//localStorage.getAccessToken(),
+                        accessToken = dataStoreRepository.observeAuthInfo()
+                            .firstOrNull()?.token ?: "",//localStorage.getAccessToken(),
                         refreshToken = ""//localStorage.getRefreshToken()
                     )
                 }
