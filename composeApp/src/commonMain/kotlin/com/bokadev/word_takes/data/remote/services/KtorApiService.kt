@@ -9,6 +9,7 @@ import com.bokadev.word_takes.data.remote.dto.LoginRequestDto
 import com.bokadev.word_takes.data.remote.dto.AuthInfoResponseDto
 import com.bokadev.word_takes.data.remote.dto.PostTakeRequestDto
 import com.bokadev.word_takes.data.remote.dto.RegisterRequestDto
+import com.bokadev.word_takes.data.remote.dto.WordsPageResponseDto
 import io.ktor.client.HttpClient
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
@@ -120,5 +121,19 @@ class KtorApiService(
             body = postTakeRequestDto
         )
     }
+
+    override suspend fun getAllWords(
+        page: Int,
+        perPage: Int
+    ): Resource<WordsPageResponseDto, NetworkError, String?> {
+        return get(
+            path = "/api/words",
+            query = mapOf(
+                "page" to page.toString(),
+                "per_page" to perPage.toString()
+            )
+        )
+    }
+
 
 }

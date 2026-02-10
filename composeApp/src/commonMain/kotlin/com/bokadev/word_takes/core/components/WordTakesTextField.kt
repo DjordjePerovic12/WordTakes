@@ -78,8 +78,8 @@ fun WordTakesTextField(
                 )
                 .clip(RoundedCornerShape(8.dp)),
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = WordTakesTheme.colors.wordTakesWhite.copy(.5f),
-                unfocusedContainerColor = WordTakesTheme.colors.wordTakesWhite.copy(.5f),
+                focusedContainerColor = WordTakesTheme.colors.wordTakesDarkGrey.copy(.3f),
+                unfocusedContainerColor = WordTakesTheme.colors.wordTakesDarkGrey.copy(.3f),
                 errorContainerColor = WordTakesTheme.colors.wordTakesWhite,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,

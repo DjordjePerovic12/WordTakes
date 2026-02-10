@@ -39,12 +39,19 @@ class HomeViewModel(
 
     private val _snackBarChannel = Channel<String>()
     val snackBarChannel = _snackBarChannel.receiveAsFlow()
+
+
+    private var didLoadFirstPage = false
+
+    private var isRequestingNextPage = false
+    private var lastRequestedPage: Int? = 0
     private val _state = MutableStateFlow(HomeState())
 
     val state = _state
         .onStart {
             if (!hasLoadedInitialData) {
                 observeWordValidation()
+                executeGetWordsFirstPage()
                 hasLoadedInitialData = true
             }
         }
@@ -86,6 +93,9 @@ class HomeViewModel(
                     it.copy(myWord = event.word)
                 }
             }
+
+            HomeEvent.Refresh -> refreshFirstPage()
+            HomeEvent.LoadNextPage -> executeGetWordsNextPage()
         }
     }
 
@@ -99,6 +109,7 @@ class HomeViewModel(
                     state.value.myWord.text
                 )
             ).onSuccess {
+                refreshFirstPage()
                 _state.update {
                     it.copy(
                         isSubmitInProgress = false,
@@ -115,4 +126,98 @@ class HomeViewModel(
             }
         }
     }
+
+
+    fun refreshFirstPage() = executeGetWordsFirstPage(force = true)
+
+    private fun executeGetWordsFirstPage(force: Boolean = false) {
+        // same logic as Outlet: reset paging flags
+        isRequestingNextPage = false
+        lastRequestedPage = 0
+
+        if (!force && didLoadFirstPage) return
+        didLoadFirstPage = true
+
+        viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    isLoading = it.items.isEmpty(),
+                    isRefreshing = force && it.items.isNotEmpty(),
+                    isLoadingNextPage = false,
+                    items = emptyList(),
+                    currentPage = 0,
+                    lastPage = 1,
+                    error = null
+                )
+            }
+
+            wordsRepository.getAllWords(page = 1, perPage = state.value.perPage)
+                .onSuccess { response ->
+                    _state.update { s ->
+                        // If you later add IDs, prefer distinctBy { it.id }
+                        val merged = response.items // first page overwrite
+                        s.copy(
+                            items = merged,
+                            currentPage = response.meta.currentPage,
+                            lastPage = response.meta.lastPage,
+                            isLoading = false,
+                            isRefreshing = false,
+                            isLoadingNextPage = false,
+                            error = null
+                        )
+                    }
+                }
+                .onError { networkError, message ->
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            isRefreshing = false,
+                            isLoadingNextPage = false
+                        )
+                    }
+                    _snackBarChannel.send(message ?: networkError.name)
+                }
+        }
+    }
+
+    fun executeGetWordsNextPage() {
+        val s = state.value
+        if (s.isLoading || s.isLoadingNextPage || !s.canLoadMore) return
+
+        val nextPage = s.currentPage + 1
+        if (isRequestingNextPage) return
+        if (nextPage == lastRequestedPage) return
+
+        isRequestingNextPage = true
+        lastRequestedPage = nextPage
+
+        viewModelScope.launch {
+            try {
+                _state.update { it.copy(isLoadingNextPage = true, error = null) }
+
+                wordsRepository.getAllWords(page = nextPage, perPage = s.perPage)
+                    .onSuccess { response ->
+                        _state.update { current ->
+                            // append, and (optionally) dedupe
+                            val appended = current.items + response.items
+                            current.copy(
+                                items = appended,
+                                currentPage = response.meta.currentPage,
+                                lastPage = response.meta.lastPage,
+                                isLoadingNextPage = false,
+                                error = null
+                            )
+                        }
+                    }
+                    .onError { networkError, message ->
+                        _state.update { it.copy(isLoadingNextPage = false) }
+                        _snackBarChannel.send(message ?: networkError.name)
+                    }
+            } finally {
+                isRequestingNextPage = false // ✅ always reset
+            }
+        }
+    }
+
+
 }

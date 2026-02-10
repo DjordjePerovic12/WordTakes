@@ -5,4 +5,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 sealed class HomeEvent {
     data class OnWordChange(val word: TextFieldValue): HomeEvent()
     data object OnSubmitClick: HomeEvent()
+
+    data object Refresh : HomeEvent()
+    data object LoadNextPage : HomeEvent()
 }

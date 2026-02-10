@@ -37,11 +37,12 @@ fun PostTakeItem(
         modifier = Modifier.fillMaxWidth()
             .height(80.dp)
             .clip(RoundedCornerShape(24.dp))
-            .background(WordTakesTheme.colors.wordTakesWhite.copy(.5f))
+            .background(WordTakesTheme.colors.wordTakesDarkGrey)
             .padding(horizontal = 12.dp)
     ) {
         WordTakesTextField(
-            modifier = Modifier.fillMaxWidth(.6f),
+            modifier = Modifier.fillMaxWidth(.6f)
+                .background(WordTakesTheme.colors.wordTakesDarkGrey.copy(.5f)),
             value = state.myWord,
             labelText = "Enter a take",
             placeholderText = "Submit a word take...",
@@ -74,9 +75,9 @@ fun PostTakeItem(
                     shape = RoundedCornerShape(20.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = WordTakesTheme.colors.wordTakesOrange,
-                        disabledContainerColor = WordTakesTheme.colors.wordTakesWhite,
+                        disabledContainerColor = WordTakesTheme.colors.wordTakesOrange.copy(.5f),
                         contentColor = WordTakesTheme.colors.wordTakesWhite,
-                        disabledContentColor = WordTakesTheme.colors.backgroundPrimary.copy(.5f)
+                        disabledContentColor = WordTakesTheme.colors.wordTakesWhite.copy(.5f)
 
                     ),
                     elevation = ButtonDefaults.buttonElevation(
