@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		D0BF19E77559BBAFDFA9BD09 /* Boqez.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Boqez.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D0BF19E77559BBAFDFA9BD09 /* Word Takes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Word Takes.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -47,6 +47,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5F997FAA221169706A6CD38C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D0BF19E77559BBAFDFA9BD09 /* Word Takes.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		ADF139DCC67B49898AEC898E = {
 			isa = PBXGroup;
 			children = (
@@ -54,14 +62,6 @@
 				037F71B99528F4A085DDB434 /* iosApp */,
 				5F997FAA221169706A6CD38C /* Products */,
 			);
-			sourceTree = "<group>";
-		};
-		5F997FAA221169706A6CD38C /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				D0BF19E77559BBAFDFA9BD09 /* Boqez.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -87,7 +87,7 @@
 			packageProductDependencies = (
 			);
 			productName = iosApp;
-			productReference = D0BF19E77559BBAFDFA9BD09 /* Boqez.app */;
+			productReference = D0BF19E77559BBAFDFA9BD09 /* Word Takes.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */

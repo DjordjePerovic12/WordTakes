@@ -5,21 +5,32 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bokadev.word_takes.core.navigation.BaseAppNavigation
 import com.bokadev.word_takes.core.navigation.Screen
 import com.bokadev.word_takes.core.navigation.utils.Navigator
+import com.bokadev.word_takes.core.navigation.utils.ObserveAsEvents
 import com.bokadev.word_takes.core.utils.CustomModifiers
 import com.bokadev.word_takes.core.utils.rememberAppState
 import io.github.aakira.napier.Napier
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 @Preview
-fun AppComposable() {
+fun AppComposable(
+    viewModel: MainViewModel = koinViewModel()
+) {
     val navigator = koinInject<Navigator>()
-    val startDestination = Screen.LoginScreen
+
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    val startDestination = if(state.isLoggedIn) Screen.HomeScreen else Screen.LoginScreen
+
     MaterialTheme {
         val appState = rememberAppState()
 

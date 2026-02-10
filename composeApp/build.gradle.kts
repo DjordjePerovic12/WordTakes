@@ -14,17 +14,17 @@ buildkonfig {
     packageName = "com.bokadev.word_takes"
 
     defaultConfigs{
-        buildConfigField(FieldSpec.Type.STRING, "BASE_URL", "https://jsonplaceholder.typicode.com/")
+        buildConfigField(FieldSpec.Type.STRING, "BASE_URL", "http://127.0.0.1:8000")
     }
 
     defaultConfigs("dev") {
-        buildConfigField(FieldSpec.Type.STRING, "BASE_URL", "https://jsonplaceholder.typicode.com/")
+        buildConfigField(FieldSpec.Type.STRING, "BASE_URL", "http://127.0.0.1:8000")
     }
     defaultConfigs("test") {
-        buildConfigField(FieldSpec.Type.STRING, "BASE_URL", "https://jsonplaceholder.typicode.com/")
+        buildConfigField(FieldSpec.Type.STRING, "BASE_URL", "http://127.0.0.1:8000")
     }
     defaultConfigs("prod") {
-        buildConfigField(FieldSpec.Type.STRING, "BASE_URL", "https://jsonplaceholder.typicode.com/")
+        buildConfigField(FieldSpec.Type.STRING, "BASE_URL", "http://127.0.0.1:8000")
     }
 }
 
@@ -69,6 +69,9 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.androidx.navigation.compose)
+
+            implementation(libs.datastore)
+            implementation(libs.datastore.preferences)
 
             //Koin
             implementation(libs.koin.core)

@@ -3,6 +3,7 @@ package com.bokadev.word_takes.core.navigation
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import com.bokadev.word_takes.core.navigation.destinations.homeScreenComposable
 import com.bokadev.word_takes.core.navigation.destinations.loginComposable
 import com.bokadev.word_takes.core.navigation.utils.NavType
 import com.bokadev.word_takes.core.navigation.utils.Navigator
@@ -41,5 +42,6 @@ fun BaseAppNavigation(
         navController = navController
     ) {
         loginComposable(showSnackBar = showSnackBar)
+        homeScreenComposable(showSnackBar = showSnackBar)
     }
 }

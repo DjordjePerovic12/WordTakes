@@ -4,7 +4,11 @@ import com.bokadev.word_takes.core.networking.NetworkError
 import com.bokadev.word_takes.core.networking.Resource
 import com.bokadev.word_takes.core.networking.addParams
 import com.bokadev.word_takes.core.networking.addQueryParams
+import com.bokadev.word_takes.core.networking.map
 import com.bokadev.word_takes.core.networking.responseToResource
+import com.bokadev.word_takes.data.remote.dto.LoginRequestDto
+import com.bokadev.word_takes.data.remote.dto.LoginResponseDto
+import com.bokadev.word_takes.domain.model.LoginResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
@@ -14,7 +18,7 @@ import io.ktor.client.request.setBody
 
 class KtorApiService(
     private val client: HttpClient
-): ApiService {
+) : ApiService {
 
     private suspend inline fun <reified T> get(
         path: String = "",
@@ -95,9 +99,11 @@ class KtorApiService(
 //    private fun sendWSMessage() {}
 //    private fun readWSMessage() {}
 
-    override suspend fun test(): Resource<Unit, NetworkError, String?> {
-        return get(
-            path = "/todos/1"
+    override suspend fun login(loginRequestDto: LoginRequestDto): Resource<LoginResponseDto, NetworkError, String?> {
+        return post(
+            path = "/api/login",
+            body = loginRequestDto
         )
     }
+
 }
