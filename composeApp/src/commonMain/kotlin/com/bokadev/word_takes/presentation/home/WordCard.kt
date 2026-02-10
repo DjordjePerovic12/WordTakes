@@ -1,6 +1,7 @@
 package com.bokadev.word_takes.presentation.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,6 +21,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.bokadev.word_takes.core.utils.formatCreatedAt
 import com.bokadev.word_takes.domain.model.WordItem
 import llc.amplitudo.cerovo.ui.theme.WordTakesTheme
 
@@ -34,7 +36,13 @@ fun WordCard(
         horizontalAlignment = Alignment.Start,
         modifier = Modifier
             .clip(RoundedCornerShape(20.dp))
-            .background(WordTakesTheme.colors.wordTakesWhite.copy(.7f))
+            .background(WordTakesTheme.colors.backgroundSecondary)
+            .border(
+                shape = RoundedCornerShape(20.dp),
+                width = 2.dp,
+                color = WordTakesTheme.colors.wordTakesOrange
+            )
+
             .padding(
                 horizontal = 15.dp,
                 vertical = 25.dp
@@ -42,13 +50,13 @@ fun WordCard(
     ) {
         Text(
             text = wordItem.name,
-            color = WordTakesTheme.colors.backgroundPrimary,
+            color = WordTakesTheme.colors.wordTakesWhite,
             style = WordTakesTheme.typogrpahy.geistBold18
         )
 
         Text(
-            text = wordItem.createdAtIso,
-            color = WordTakesTheme.colors.backgroundPrimary,
+            text = wordItem.createdAtIso.formatCreatedAt(),
+            color = WordTakesTheme.colors.wordTakesWhite,
             style = WordTakesTheme.typogrpahy.geistLight14
         )
 
@@ -58,7 +66,7 @@ fun WordCard(
         ) {
             Text(
                 text = wordItem.word,
-                color = WordTakesTheme.colors.backgroundPrimary,
+                color = WordTakesTheme.colors.wordTakesWhite,
                 style = WordTakesTheme.typogrpahy.geistSemiBold24,
                 letterSpacing = 20.sp
             )

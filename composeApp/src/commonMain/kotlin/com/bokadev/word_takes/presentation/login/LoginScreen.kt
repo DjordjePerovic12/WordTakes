@@ -132,7 +132,7 @@ fun LoginScreen(
             shape = RoundedCornerShape(20.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = WordTakesTheme.colors.wordTakesOrange,
-                disabledContainerColor = WordTakesTheme.colors.wordTakesWhite,
+                disabledContainerColor = WordTakesTheme.colors.wordTakesWhite.copy(.6f),
                 contentColor = WordTakesTheme.colors.wordTakesWhite,
                 disabledContentColor = WordTakesTheme.colors.backgroundPrimary.copy(.5f)
 

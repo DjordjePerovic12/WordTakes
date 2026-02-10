@@ -18,17 +18,17 @@ buildkonfig {
 //    http://192.168.1.141:8000 device,
 
     defaultConfigs{
-        buildConfigField(FieldSpec.Type.STRING, "BASE_URL", "http://10.0.2.2:8000")
+        buildConfigField(FieldSpec.Type.STRING, "BASE_URL", "http://127.0.0.1:8000")
     }
 
     defaultConfigs("dev") {
-        buildConfigField(FieldSpec.Type.STRING, "BASE_URL", "http://10.0.2.2:8000")
+        buildConfigField(FieldSpec.Type.STRING, "BASE_URL", "http://127.0.0.1:8000")
     }
     defaultConfigs("test") {
-        buildConfigField(FieldSpec.Type.STRING, "BASE_URL", "http://10.0.2.2:8000")
+        buildConfigField(FieldSpec.Type.STRING, "BASE_URL", "http://127.0.0.1:8000")
     }
     defaultConfigs("prod") {
-        buildConfigField(FieldSpec.Type.STRING, "BASE_URL", "http://10.0.2.2:8000")
+        buildConfigField(FieldSpec.Type.STRING, "BASE_URL", "http://127.0.0.1:8000")
     }
 }
 
@@ -92,6 +92,7 @@ kotlin {
 
             //Serialization
             implementation(libs.kotlinx.serialization)
+            implementation(libs.kotlinx.datetime)
 
             implementation(libs.core.splashscreen)
 

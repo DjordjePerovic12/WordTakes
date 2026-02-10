@@ -8,10 +8,14 @@ import androidx.compose.ui.graphics.Color
 @Immutable
 data class WordTakesColors(
     val backgroundPrimary: Color,
+    val backgroundSecondary: Color,
+    val primaryText: Color,
     val wordTakesWhite: Color,
     val wordTakesOrange: Color,
     val wordTakesDarkGrey: Color,
     val wordTakesGreen: Color,
+    val wordTakesBorderColor: Color,
+    val wordTakesCardBackground: Color,
     val colorBlack: Color,
     val colorWhite: Color,
     val colorDarkGrey: Color,
@@ -35,11 +39,15 @@ val LocalWordTakesColors = staticCompositionLocalOf<WordTakesColors> {
 
 // You can keep this as a regular val, no @Composable needed
 val wordTakesColors = WordTakesColors(
-    backgroundPrimary = Color(0xFF1B3C53),
+    backgroundPrimary = Color(0xFF0C2230),
+    backgroundSecondary = Color(0xFF132F42),
+    primaryText = Color(0xFF0E2533),
     wordTakesWhite = Color(0XFFE3E3E3),
-    wordTakesOrange = Color(0XFFF8843F),
+    wordTakesOrange = Color(0XFFC26D3A),
     wordTakesDarkGrey = Color(0XFF212A31),
     wordTakesGreen = Color(0xFF1C9B8E),
+    wordTakesCardBackground = Color(0xFFAEBAC2),
+    wordTakesBorderColor = Color(0xFFC7D1D8),
     colorBlack = Color(0xFF000000),
     colorWhite = Color(0xFFFFFFFF),
     colorDarkGrey = Color(0xFF404041),

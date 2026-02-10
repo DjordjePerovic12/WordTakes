@@ -73,7 +73,7 @@ fun WordTakesTextField(
                 }
                 .border(
                     width = 1.dp,
-                    color = if (isError) WordTakesTheme.colors.errorRed else WordTakesTheme.colors.wordTakesWhite,
+                    color = if (isError) WordTakesTheme.colors.errorRed else WordTakesTheme.colors.wordTakesOrange,
                     shape = RoundedCornerShape(8.dp)
                 )
                 .clip(RoundedCornerShape(8.dp)),
@@ -81,12 +81,13 @@ fun WordTakesTextField(
                 focusedContainerColor = WordTakesTheme.colors.wordTakesDarkGrey.copy(.3f),
                 unfocusedContainerColor = WordTakesTheme.colors.wordTakesDarkGrey.copy(.3f),
                 errorContainerColor = WordTakesTheme.colors.wordTakesWhite,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
+                focusedIndicatorColor = WordTakesTheme.colors.wordTakesOrange,
+                unfocusedIndicatorColor = WordTakesTheme.colors.wordTakesOrange,
                 errorIndicatorColor = Color.Transparent,
                 focusedTextColor = WordTakesTheme.colors.wordTakesWhite,
                 unfocusedTextColor = WordTakesTheme.colors.wordTakesWhite.copy(.5f),
                 cursorColor = WordTakesTheme.colors.wordTakesWhite,
+                disabledIndicatorColor = WordTakesTheme.colors.wordTakesOrange,
             )
         )
 

@@ -1,6 +1,7 @@
 package com.bokadev.word_takes.presentation.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -37,12 +38,12 @@ fun PostTakeItem(
         modifier = Modifier.fillMaxWidth()
             .height(80.dp)
             .clip(RoundedCornerShape(24.dp))
-            .background(WordTakesTheme.colors.wordTakesDarkGrey)
+            .background(WordTakesTheme.colors.backgroundSecondary)
             .padding(horizontal = 12.dp)
     ) {
         WordTakesTextField(
             modifier = Modifier.fillMaxWidth(.6f)
-                .background(WordTakesTheme.colors.wordTakesDarkGrey.copy(.5f)),
+                .background(WordTakesTheme.colors.backgroundSecondary),
             value = state.myWord,
             labelText = "Enter a take",
             placeholderText = "Submit a word take...",
@@ -75,9 +76,9 @@ fun PostTakeItem(
                     shape = RoundedCornerShape(20.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = WordTakesTheme.colors.wordTakesOrange,
-                        disabledContainerColor = WordTakesTheme.colors.wordTakesOrange.copy(.5f),
+                        disabledContainerColor = WordTakesTheme.colors.colorWhite.copy(.6f),
                         contentColor = WordTakesTheme.colors.wordTakesWhite,
-                        disabledContentColor = WordTakesTheme.colors.wordTakesWhite.copy(.5f)
+                        disabledContentColor = WordTakesTheme.colors.backgroundPrimary
 
                     ),
                     elevation = ButtonDefaults.buttonElevation(
