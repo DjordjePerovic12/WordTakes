@@ -20,7 +20,8 @@ data class HomeState(
     val currentPage: Int = 0,
     val lastPage: Int = 1,
 
-    val perPage: Int = 20
+    val perPage: Int = 20,
+    val isRateInProgress: Boolean = false
 ) {
     val canLoadMore: Boolean
         get() = currentPage < lastPage

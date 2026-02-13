@@ -10,6 +10,8 @@ import com.bokadev.word_takes.core.networking.onError
 import com.bokadev.word_takes.core.networking.onSuccess
 import com.bokadev.word_takes.data.remote.dto.LoginRequestDto
 import com.bokadev.word_takes.data.remote.dto.PostTakeRequestDto
+import com.bokadev.word_takes.data.remote.dto.RateWordRequestDto
+import com.bokadev.word_takes.data.remote.dto.ReactionRequestDto
 import com.bokadev.word_takes.domain.repository.DataStoreRepository
 import com.bokadev.word_takes.domain.repository.WordsRepository
 import io.github.aakira.napier.Napier
@@ -96,6 +98,13 @@ class HomeViewModel(
 
             HomeEvent.Refresh -> refreshFirstPage()
             HomeEvent.LoadNextPage -> executeGetWordsNextPage()
+
+            is HomeEvent.OnRateWordClick -> {
+                executeRateWord(
+                    wordId = event.wordId,
+                    reaction = event.reaction
+                )
+            }
         }
     }
 
@@ -216,6 +225,36 @@ class HomeViewModel(
                     }
             } finally {
                 isRequestingNextPage = false // ✅ always reset
+            }
+        }
+    }
+
+    private fun executeRateWord(wordId: Int, reaction: String) {
+        _state.update {
+            it.copy(isRateInProgress = true)
+        }
+        viewModelScope.launch {
+            wordsRepository.rateWord(
+                wordId = wordId,
+                body = RateWordRequestDto(
+                    reaction = reaction
+                )
+            ).onSuccess {
+                refreshFirstPage()
+                _state.update {
+                    it.copy(
+                        isSubmitInProgress = false,
+                        myWord = TextFieldValue()
+                    )
+                }
+
+                _snackBarChannel.send("Word posted successfully")
+            }.onError { networkError, message ->
+                _snackBarChannel.send(message ?: networkError.name)
+                _state.update {
+                    it.copy(isSubmitInProgress = false)
+                }
+
             }
         }
     }

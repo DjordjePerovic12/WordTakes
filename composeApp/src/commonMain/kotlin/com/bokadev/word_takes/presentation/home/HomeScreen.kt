@@ -104,7 +104,10 @@ fun HomeScreen(
 
         items(state.items) { word ->
             WordCard(
-                wordItem = word
+                wordItem = word,
+                onRateClick = {
+                    viewModel.onEvent(HomeEvent.OnRateWordClick(wordId = word.id, reaction = it))
+                }
             )
         }
     }

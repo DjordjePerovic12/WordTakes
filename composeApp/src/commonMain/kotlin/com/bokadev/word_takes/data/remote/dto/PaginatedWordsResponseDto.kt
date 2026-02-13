@@ -8,7 +8,6 @@ data class WordsPageResponseDto(
     @SerialName("current_page")
     val currentPage: Int,
     val data: List<WordDto>,
-
     @SerialName("first_page_url")
     val firstPageUrl: String? = null,
 

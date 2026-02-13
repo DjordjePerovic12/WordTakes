@@ -27,10 +27,12 @@ fun WordsPageResponseDto.toDomain(): PaginatedWords {
 
 fun WordDto.toDomain(): WordItem =
     WordItem(
+        id = id,
         name = name,
         createdAtIso = createdAt,
         word = word,
-        reactions = reactions.toDomain()
+        reactions = reactions.toDomain(),
+        myReaction = myReaction
     )
 
 fun ReactionsDto.toDomain(): Reactions =

@@ -4,6 +4,7 @@ import com.bokadev.word_takes.core.networking.NetworkError
 import com.bokadev.word_takes.core.networking.Resource
 import com.bokadev.word_takes.core.networking.map
 import com.bokadev.word_takes.data.remote.dto.PostTakeRequestDto
+import com.bokadev.word_takes.data.remote.dto.RateWordRequestDto
 import com.bokadev.word_takes.data.remote.mapper.toDomain
 import com.bokadev.word_takes.data.remote.services.ApiService
 import com.bokadev.word_takes.domain.model.PaginatedWords
@@ -24,5 +25,15 @@ class WordsRepositoryImpl(
         return apiService.getAllWords(
             page, perPage
         ).map { it.toDomain() }
+    }
+
+    override suspend fun rateWord(
+        wordId: Int,
+        body: RateWordRequestDto
+    ): Resource<Unit, NetworkError, String?> {
+        return apiService.rateWord(
+            wordId = wordId,
+            rateWordRequestDto = body
+        )
     }
 }

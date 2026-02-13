@@ -3,6 +3,7 @@ package com.bokadev.word_takes.domain.repository
 import com.bokadev.word_takes.core.networking.NetworkError
 import com.bokadev.word_takes.core.networking.Resource
 import com.bokadev.word_takes.data.remote.dto.PostTakeRequestDto
+import com.bokadev.word_takes.data.remote.dto.RateWordRequestDto
 import com.bokadev.word_takes.domain.model.PaginatedWords
 
 interface WordsRepository {
@@ -14,4 +15,9 @@ interface WordsRepository {
         page: Int = 1,
         perPage: Int = 20
     ): Resource<PaginatedWords, NetworkError, String?>
+
+    suspend fun rateWord(
+        wordId: Int,
+        body: RateWordRequestDto
+    ): Resource<Unit, NetworkError, String?>
 }

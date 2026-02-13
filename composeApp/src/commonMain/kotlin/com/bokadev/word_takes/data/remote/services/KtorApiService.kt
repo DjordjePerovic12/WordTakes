@@ -8,6 +8,7 @@ import com.bokadev.word_takes.core.networking.responseToResource
 import com.bokadev.word_takes.data.remote.dto.LoginRequestDto
 import com.bokadev.word_takes.data.remote.dto.AuthInfoResponseDto
 import com.bokadev.word_takes.data.remote.dto.PostTakeRequestDto
+import com.bokadev.word_takes.data.remote.dto.RateWordRequestDto
 import com.bokadev.word_takes.data.remote.dto.RegisterRequestDto
 import com.bokadev.word_takes.data.remote.dto.WordsPageResponseDto
 import io.ktor.client.HttpClient
@@ -132,6 +133,19 @@ class KtorApiService(
                 "page" to page.toString(),
                 "per_page" to perPage.toString()
             )
+        )
+    }
+
+    override suspend fun rateWord(
+        wordId: Int,
+        rateWordRequestDto: RateWordRequestDto
+    ): Resource<Unit, NetworkError, String?> {
+        return post(
+            path = "/api/words/{wordPost}/rate",
+            params = mapOf(
+                "wordPost" to wordId.toString(),
+            ),
+            body = rateWordRequestDto
         )
     }
 

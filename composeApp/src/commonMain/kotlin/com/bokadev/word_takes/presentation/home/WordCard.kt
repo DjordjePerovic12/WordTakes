@@ -18,9 +18,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bokadev.word_takes.core.utils.formatCreatedAt
+import com.bokadev.word_takes.core.utils.reactionsToGradient
+import com.bokadev.word_takes.data.remote.dto.RateWordRequestDto
+import com.bokadev.word_takes.data.remote.dto.ReactionRequestDto
 import com.bokadev.word_takes.domain.model.WordItem
 import llc.amplitudo.cerovo.ui.theme.WordTakesTheme
 import org.jetbrains.compose.resources.vectorResource
@@ -33,20 +38,38 @@ import word_takes.composeapp.generated.resources.party_popper
 @Composable
 fun WordCard(
     modifier: Modifier = Modifier,
-    wordItem: WordItem
+    wordItem: WordItem,
+    onRateClick: (String) -> Unit
 ) {
-
-
+    val votesCount =
+        wordItem.reactions.bad + wordItem.reactions.good + wordItem.reactions.awful + wordItem.reactions.amazing
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp, alignment = Alignment.Top),
         horizontalAlignment = Alignment.Start,
         modifier = Modifier
             .clip(RoundedCornerShape(20.dp))
-            .background(WordTakesTheme.colors.backgroundSecondary)
+            .background(
+                if (wordItem.myReaction == null)
+//                    Brush.linearGradient(
+//                        colors = listOf(
+//                            WordTakesTheme.colors.wordTakesWhite.copy(.2f),
+//                            WordTakesTheme.colors.wordTakesWhite.copy(.4f),
+//                            WordTakesTheme.colors.wordTakesWhite.copy(.6f),
+//                        )
+//                    )
+                    SolidColor(WordTakesTheme.colors.wordTakesWhite.copy(.95f))
+                else
+                    reactionsToGradient(
+                        reactions = wordItem.reactions
+                    )
+            )
             .border(
                 shape = RoundedCornerShape(20.dp),
                 width = 2.dp,
-                color = WordTakesTheme.colors.wordTakesOrange
+                brush = if (votesCount == 0) SolidColor(WordTakesTheme.colors.wordTakesOrange) else
+                    reactionsToGradient(
+                        reactions = wordItem.reactions
+                    )
             )
 
             .padding(
@@ -56,13 +79,13 @@ fun WordCard(
     ) {
         Text(
             text = wordItem.name,
-            color = WordTakesTheme.colors.wordTakesWhite,
+            color = WordTakesTheme.colors.backgroundPrimary,
             style = WordTakesTheme.typogrpahy.geistBold18
         )
 
         Text(
             text = wordItem.createdAtIso.formatCreatedAt(),
-            color = WordTakesTheme.colors.wordTakesWhite,
+            color = WordTakesTheme.colors.backgroundPrimary,
             style = WordTakesTheme.typogrpahy.geistLight14
         )
 
@@ -72,124 +95,186 @@ fun WordCard(
         ) {
             Text(
                 text = wordItem.word,
-                color = WordTakesTheme.colors.wordTakesWhite,
+                color = WordTakesTheme.colors.backgroundPrimary,
                 style = WordTakesTheme.typogrpahy.geistSemiBold24,
                 letterSpacing = 20.sp
             )
         }
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Button(
-                onClick = {
-                },
-                modifier = Modifier.wrapContentWidth()
-                    .height(45.dp)
-                    .clip(
-                        RoundedCornerShape(
-                            8.dp
-                        )
-                    ),
-                shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = WordTakesTheme.colors.wordTakesGood,
-                    contentColor = WordTakesTheme.colors.wordTakesWhite,
-                ),
-                elevation = ButtonDefaults.buttonElevation(
-                    defaultElevation = 6.dp
-                ),
-                content = {
-                    Icon(
-                        imageVector = vectorResource(Res.drawable.ic_thumbs_up),
-                        contentDescription = null,
-                        tint = WordTakesTheme.colors.backgroundSecondary
-                    )
-                }
-            )
 
-            Button(
-                onClick = {
-                },
-                modifier = Modifier.wrapContentWidth()
-                    .height(45.dp)
-                    .clip(
-                        RoundedCornerShape(
-                            8.dp
-                        )
-                    ),
-                shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = WordTakesTheme.colors.wordTakesAmazing,
-                    contentColor = WordTakesTheme.colors.wordTakesWhite,
-                ),
-                elevation = ButtonDefaults.buttonElevation(
-                    defaultElevation = 6.dp
-                ),
-                content = {
-                    Icon(
-                        imageVector = vectorResource(Res.drawable.party_popper),
-                        contentDescription = null,
-                        tint = WordTakesTheme.colors.backgroundSecondary
+        when (wordItem.myReaction) {
+            null -> {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Button(
+                        onClick = {
+                            onRateClick(ReactionRequestDto.GOOD.name.lowercase())
+                        },
+                        modifier = Modifier.wrapContentWidth()
+                            .height(45.dp)
+                            .clip(
+                                RoundedCornerShape(
+                                    8.dp
+                                )
+                            )
+                            .border(
+                                width = 1.dp,
+                                color = WordTakesTheme.colors.backgroundPrimary,
+                                shape = RoundedCornerShape(8.dp)
+                            ),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = WordTakesTheme.colors.wordTakesGood,
+                            contentColor = WordTakesTheme.colors.wordTakesWhite,
+                        ),
+                        elevation = ButtonDefaults.buttonElevation(
+                            defaultElevation = 6.dp
+                        ),
+                        content = {
+                            Icon(
+                                imageVector = vectorResource(Res.drawable.ic_thumbs_up),
+                                contentDescription = null,
+                                tint = WordTakesTheme.colors.backgroundSecondary
+                            )
+                        }
                     )
-                }
-            )
 
-            Button(
-                onClick = {
-                },
-                modifier = Modifier.wrapContentWidth()
-                    .height(45.dp)
-                    .clip(
-                        RoundedCornerShape(
-                            8.dp
-                        )
-                    ),
-                shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = WordTakesTheme.colors.wordTakesBad,
-                    contentColor = WordTakesTheme.colors.wordTakesWhite,
-                ),
-                elevation = ButtonDefaults.buttonElevation(
-                    defaultElevation = 6.dp
-                ),
-                content = {
-                    Icon(
-                        imageVector = vectorResource(Res.drawable.ic_thumbs_down),
-                        contentDescription = null,
-                        tint = WordTakesTheme.colors.backgroundSecondary
-                    )
-                }
-            )
+                    Button(
+                        onClick = {
+                            onRateClick(ReactionRequestDto.AMAZING.name.lowercase())
 
-            Button(
-                onClick = {
-                },
-                modifier = Modifier.wrapContentWidth()
-                    .height(45.dp)
-                    .clip(
-                        RoundedCornerShape(
-                            8.dp
-                        )
-                    ),
-                shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = WordTakesTheme.colors.wordTakesAwful,
-                    contentColor = WordTakesTheme.colors.wordTakesWhite,
-                ),
-                elevation = ButtonDefaults.buttonElevation(
-                    defaultElevation = 6.dp
-                ),
-                content = {
-                    Icon(
-                        imageVector = vectorResource(Res.drawable.ic_angry),
-                        contentDescription = null,
-                        tint = WordTakesTheme.colors.backgroundSecondary
+                        },
+                        modifier = Modifier.wrapContentWidth()
+                            .height(45.dp)
+                            .clip(
+                                RoundedCornerShape(
+                                    8.dp
+                                )
+                            )
+                            .border(
+                                width = 1.dp,
+                                color = WordTakesTheme.colors.backgroundPrimary,
+                                shape = RoundedCornerShape(8.dp)
+                            ),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = WordTakesTheme.colors.wordTakesAmazing,
+                            contentColor = WordTakesTheme.colors.wordTakesWhite,
+                        ),
+                        elevation = ButtonDefaults.buttonElevation(
+                            defaultElevation = 6.dp
+                        ),
+                        content = {
+                            Icon(
+                                imageVector = vectorResource(Res.drawable.party_popper),
+                                contentDescription = null,
+                                tint = WordTakesTheme.colors.backgroundSecondary
+                            )
+                        }
+                    )
+
+                    Button(
+                        onClick = {
+                            onRateClick(ReactionRequestDto.BAD.name.lowercase())
+
+                        },
+                        modifier = Modifier.wrapContentWidth()
+                            .height(45.dp)
+                            .clip(
+                                RoundedCornerShape(
+                                    8.dp
+                                )
+                            )
+                            .border(
+                                width = 1.dp,
+                                color = WordTakesTheme.colors.backgroundPrimary,
+                                shape = RoundedCornerShape(8.dp)
+                            ),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = WordTakesTheme.colors.wordTakesBad,
+                            contentColor = WordTakesTheme.colors.wordTakesWhite,
+                        ),
+                        elevation = ButtonDefaults.buttonElevation(
+                            defaultElevation = 6.dp
+                        ),
+                        content = {
+                            Icon(
+                                imageVector = vectorResource(Res.drawable.ic_thumbs_down),
+                                contentDescription = null,
+                                tint = WordTakesTheme.colors.backgroundSecondary
+                            )
+                        }
+                    )
+
+                    Button(
+                        onClick = {
+                            onRateClick(ReactionRequestDto.AWFUL.name.lowercase())
+
+                        },
+                        modifier = Modifier.wrapContentWidth()
+                            .height(45.dp)
+                            .clip(
+                                RoundedCornerShape(
+                                    8.dp
+                                )
+                            )
+                            .border(
+                                width = 1.dp,
+                                color = WordTakesTheme.colors.backgroundPrimary,
+                                shape = RoundedCornerShape(8.dp)
+                            ),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = WordTakesTheme.colors.wordTakesAwful,
+                            contentColor = WordTakesTheme.colors.wordTakesWhite,
+                        ),
+                        elevation = ButtonDefaults.buttonElevation(
+                            defaultElevation = 6.dp
+                        ),
+                        content = {
+                            Icon(
+                                imageVector = vectorResource(Res.drawable.ic_angry),
+                                contentDescription = null,
+                                tint = WordTakesTheme.colors.backgroundSecondary
+                            )
+                        }
                     )
                 }
-            )
+            }
+
+            else -> {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(WordTakesTheme.colors.backgroundPrimary)
+                        .border(
+                            shape = RoundedCornerShape(20.dp),
+                            width = 2.dp,
+                            brush = if (votesCount == 0) SolidColor(WordTakesTheme.colors.wordTakesOrange) else
+                                reactionsToGradient(
+                                    reactions = wordItem.reactions
+                                )
+                        )
+                        .padding(15.dp)
+
+                ) {
+                    val decideLabel = when (votesCount - 1) {
+                        0 -> "You are the only one that rated the word"
+                        else -> "You and ${votesCount - 1} rated this word"
+                    }
+                    Text(
+                        decideLabel,
+                        color = WordTakesTheme.colors.wordTakesWhite,
+                        style = WordTakesTheme.typogrpahy.geistSemiBold14
+                    )
+                }
+            }
         }
     }
 }
