@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,6 +27,7 @@ import com.bokadev.word_takes.core.utils.formatCreatedAt
 import com.bokadev.word_takes.core.utils.reactionsToGradient
 import com.bokadev.word_takes.data.remote.dto.RateWordRequestDto
 import com.bokadev.word_takes.data.remote.dto.ReactionRequestDto
+import com.bokadev.word_takes.domain.model.Reactions
 import com.bokadev.word_takes.domain.model.WordItem
 import llc.amplitudo.cerovo.ui.theme.WordTakesTheme
 import org.jetbrains.compose.resources.vectorResource
@@ -42,14 +44,27 @@ fun WordCard(
     onRateClick: (String) -> Unit
 ) {
     val votesCount =
-        wordItem.reactions.bad + wordItem.reactions.good + wordItem.reactions.awful + wordItem.reactions.amazing
+        wordItem.reactions.bad + wordItem.reactions.good + wordItem.reactions.awful + wordItem.reactions.amazing + wordItem.reactions.skipped
+
+    val decideLabel = when (votesCount) {
+        1 -> {
+            if (wordItem.myReaction == ReactionRequestDto.SKIPPED.name.lowercase()) "No one rated the word yet"
+            else "You are the only one that rated the word"
+        }
+
+        2 -> if (wordItem.myReaction == ReactionRequestDto.SKIPPED.name.lowercase()) "1 person rated the word" else if(wordItem.reactions.skipped == 1) "You are the only one that rated the word" else
+            "You and 1 other person rated the word"
+
+        else -> if (wordItem.myReaction == ReactionRequestDto.SKIPPED.name.lowercase()) "${votesCount - wordItem.reactions.skipped - 1}  people rated this word" else
+            "You and ${votesCount - wordItem.reactions.skipped - 1}  others rated this word"
+    }
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp, alignment = Alignment.Top),
         horizontalAlignment = Alignment.Start,
         modifier = Modifier
             .clip(RoundedCornerShape(20.dp))
             .background(
-                if (wordItem.myReaction == null)
+                if (wordItem.myReaction == null || (wordItem.myReaction == ReactionRequestDto.SKIPPED.name.lowercase() && votesCount == 0))
 //                    Brush.linearGradient(
 //                        colors = listOf(
 //                            WordTakesTheme.colors.wordTakesWhite.copy(.2f),
@@ -77,17 +92,57 @@ fun WordCard(
                 vertical = 25.dp
             )
     ) {
-        Text(
-            text = wordItem.name,
-            color = WordTakesTheme.colors.backgroundPrimary,
-            style = WordTakesTheme.typogrpahy.geistBold18
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
 
-        Text(
-            text = wordItem.createdAtIso.formatCreatedAt(),
-            color = WordTakesTheme.colors.backgroundPrimary,
-            style = WordTakesTheme.typogrpahy.geistLight14
-        )
+            Column(verticalArrangement = Arrangement.SpaceBetween) {
+                Text(
+                    text = wordItem.name,
+                    color = WordTakesTheme.colors.backgroundPrimary,
+                    style = WordTakesTheme.typogrpahy.geistBold18
+                )
+
+                Text(
+                    text = wordItem.createdAtIso.formatCreatedAt(),
+                    color = WordTakesTheme.colors.backgroundPrimary,
+                    style = WordTakesTheme.typogrpahy.geistLight14
+                )
+            }
+
+            if (wordItem.myReaction == null)
+                Button(
+                    onClick = {
+                        onRateClick(ReactionRequestDto.SKIPPED.name.lowercase())
+                    },
+                    modifier = Modifier.wrapContentWidth()
+                        .height(45.dp)
+                        .clip(
+                            RoundedCornerShape(
+                                8.dp
+                            )
+                        )
+                        .border(
+                            width = 1.dp,
+                            color = WordTakesTheme.colors.backgroundPrimary,
+                            shape = RoundedCornerShape(8.dp)
+                        ),
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = WordTakesTheme.colors.wordTakesWhite.copy(.5f),
+                    ),
+                    content = {
+                        Text(
+                            text = "SKIP RATING",
+                            color = WordTakesTheme.colors.primaryText,
+                            style = WordTakesTheme.typogrpahy.geistSemiBold14
+                        )
+                    }
+                )
+        }
+
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -264,10 +319,7 @@ fun WordCard(
                         .padding(15.dp)
 
                 ) {
-                    val decideLabel = when (votesCount - 1) {
-                        0 -> "You are the only one that rated the word"
-                        else -> "You and ${votesCount - 1} rated this word"
-                    }
+
                     Text(
                         decideLabel,
                         color = WordTakesTheme.colors.wordTakesWhite,

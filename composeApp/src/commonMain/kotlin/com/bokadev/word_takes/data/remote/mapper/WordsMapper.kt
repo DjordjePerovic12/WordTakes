@@ -36,4 +36,4 @@ fun WordDto.toDomain(): WordItem =
     )
 
 fun ReactionsDto.toDomain(): Reactions =
-    Reactions(good = good, amazing = amazing, bad = bad, awful = awful)
+    Reactions(good = good, amazing = amazing, bad = bad, awful = awful, skipped = skipped)

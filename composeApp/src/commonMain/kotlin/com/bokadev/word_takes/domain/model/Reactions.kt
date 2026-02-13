@@ -4,5 +4,6 @@ data class Reactions(
     val good: Int,
     val amazing: Int,
     val bad: Int,
-    val awful: Int
+    val awful: Int,
+    val skipped: Int
 )

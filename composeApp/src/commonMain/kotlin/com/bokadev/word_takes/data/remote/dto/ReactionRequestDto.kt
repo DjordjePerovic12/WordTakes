@@ -7,5 +7,6 @@ enum class ReactionRequestDto {
     GOOD,
     AMAZING,
     BAD,
-    AWFUL
+    AWFUL,
+    SKIPPED
 }
