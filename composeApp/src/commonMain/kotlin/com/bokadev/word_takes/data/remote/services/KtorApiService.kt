@@ -7,6 +7,7 @@ import com.bokadev.word_takes.core.networking.addQueryParams
 import com.bokadev.word_takes.core.networking.responseToResource
 import com.bokadev.word_takes.data.remote.dto.LoginRequestDto
 import com.bokadev.word_takes.data.remote.dto.AuthInfoResponseDto
+import com.bokadev.word_takes.data.remote.dto.PaginatedRatingsResponseDto
 import com.bokadev.word_takes.data.remote.dto.PostTakeRequestDto
 import com.bokadev.word_takes.data.remote.dto.RateWordRequestDto
 import com.bokadev.word_takes.data.remote.dto.RegisterRequestDto
@@ -146,6 +147,24 @@ class KtorApiService(
                 "wordPost" to wordId.toString(),
             ),
             body = rateWordRequestDto
+        )
+    }
+
+
+    override suspend fun getAllRatings(
+        wordId: Int,
+        page: Int,
+        perPage: Int,
+    ): Resource<PaginatedRatingsResponseDto, NetworkError, String?> {
+        return get(
+            path = "/api/words/{wordPost}/ratings",
+            params = mapOf(
+                "wordPost" to wordId.toString(),
+            ),
+            query = mapOf(
+                "page" to page.toString(),
+                "per_page" to perPage.toString()
+            )
         )
     }
 

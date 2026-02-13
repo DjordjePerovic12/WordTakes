@@ -14,4 +14,10 @@ sealed class HomeEvent {
         val wordId: Int,
         val reaction: String
     ) : HomeEvent()
+
+
+    data class OnSeeRatingsClick(val selectedWord: String) : HomeEvent()
+    data class ToggleBottomSheet(val wordId: Int, val selectedWord: String) : HomeEvent()
+
+    data object LoadRatingsNextPage : HomeEvent()
 }

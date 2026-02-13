@@ -4,17 +4,13 @@ package com.bokadev.word_takes.presentation.home
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bokadev.word_takes.core.navigation.Screen
 import com.bokadev.word_takes.core.navigation.utils.Navigator
 import com.bokadev.word_takes.core.networking.onError
 import com.bokadev.word_takes.core.networking.onSuccess
-import com.bokadev.word_takes.data.remote.dto.LoginRequestDto
 import com.bokadev.word_takes.data.remote.dto.PostTakeRequestDto
 import com.bokadev.word_takes.data.remote.dto.RateWordRequestDto
-import com.bokadev.word_takes.data.remote.dto.ReactionRequestDto
 import com.bokadev.word_takes.domain.repository.DataStoreRepository
 import com.bokadev.word_takes.domain.repository.WordsRepository
-import io.github.aakira.napier.Napier
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -47,6 +43,11 @@ class HomeViewModel(
 
     private var isRequestingNextPage = false
     private var lastRequestedPage: Int? = 0
+
+
+    private var didLoadRatingsFirstPage = false
+    private var isRequestingRatingsNextPage = false
+    private var lastRequestedRatingsPage: Int? = 0
     private val _state = MutableStateFlow(HomeState())
 
     val state = _state
@@ -104,6 +105,28 @@ class HomeViewModel(
                     wordId = event.wordId,
                     reaction = event.reaction
                 )
+            }
+
+            is HomeEvent.OnSeeRatingsClick -> {
+                _state.update {
+                    it.copy(selectedWord = event.selectedWord)
+                }
+            }
+
+            is HomeEvent.ToggleBottomSheet -> {
+                executeGetRatingsFirstPage(
+                    wordId = event.wordId
+                )
+                _state.update {
+                    it.copy(
+                        shouldShowRatingsBottomSheet = !state.value.shouldShowRatingsBottomSheet,
+                        selectedWord = event.selectedWord
+                    )
+                }
+            }
+
+            is HomeEvent.LoadRatingsNextPage -> {
+                executeGetRatingsNextPage()
             }
         }
     }
@@ -255,6 +278,103 @@ class HomeViewModel(
                     it.copy(isSubmitInProgress = false)
                 }
 
+            }
+        }
+    }
+
+
+    private fun executeGetRatingsFirstPage(wordId: Int, force: Boolean = false) {
+        // reset paging flags
+        isRequestingRatingsNextPage = false
+        lastRequestedRatingsPage = 0
+
+        if (!force && didLoadRatingsFirstPage) return
+        didLoadRatingsFirstPage = true
+
+        viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    ratingsWordId = wordId,
+                    isRatingsLoading = it.ratingsItems.isEmpty(),
+                    isRatingsRefreshing = force && it.ratingsItems.isNotEmpty(),
+                    isRatingsLoadingNextPage = false,
+                    ratingsItems = emptyList(),
+                    ratingsTotals = null,
+                    ratingsCurrentPage = 0,
+                    ratingsLastPage = 1
+                )
+            }
+
+            val perPage = state.value.ratingsPerPage
+
+            wordsRepository.getAllRatings(wordId = wordId, page = 1, perPage = perPage)
+                .onSuccess { response ->
+                    _state.update {
+                        it.copy(
+                            ratingsWordId = wordId,
+                            ratingsItems = response.items,
+                            ratingsTotals = response.reactions,
+                            ratingsCurrentPage = response.meta.currentPage,
+                            ratingsLastPage = response.meta.lastPage,
+                            isRatingsLoading = false,
+                            isRatingsRefreshing = false,
+                            isRatingsLoadingNextPage = false
+                        )
+                    }
+                }
+                .onError { networkError, message ->
+                    _state.update {
+                        it.copy(
+                            isRatingsLoading = false,
+                            isRatingsRefreshing = false,
+                            isRatingsLoadingNextPage = false
+                        )
+                    }
+                    _snackBarChannel.send(message ?: networkError.name)
+                }
+        }
+    }
+
+    fun executeGetRatingsNextPage() {
+        val s = state.value
+        val wordId = s.ratingsWordId ?: return
+
+        if (s.isRatingsLoading || s.isRatingsLoadingNextPage || !s.canLoadMoreRatings) return
+
+        val nextPage = s.ratingsCurrentPage + 1
+        if (isRequestingRatingsNextPage) return
+        if (nextPage == lastRequestedRatingsPage) return
+
+        isRequestingRatingsNextPage = true
+        lastRequestedRatingsPage = nextPage
+
+        viewModelScope.launch {
+            try {
+                _state.update { it.copy(isRatingsLoadingNextPage = true) }
+
+                wordsRepository.getAllRatings(
+                    wordId = wordId,
+                    page = nextPage,
+                    perPage = s.ratingsPerPage
+                )
+                    .onSuccess { response ->
+                        _state.update { current ->
+                            val appended = current.ratingsItems + response.items
+                            current.copy(
+                                ratingsItems = appended,
+                                ratingsTotals = response.reactions, // keep updated
+                                ratingsCurrentPage = response.meta.currentPage,
+                                ratingsLastPage = response.meta.lastPage,
+                                isRatingsLoadingNextPage = false
+                            )
+                        }
+                    }
+                    .onError { networkError, message ->
+                        _state.update { it.copy(isRatingsLoadingNextPage = false) }
+                        _snackBarChannel.send(message ?: networkError.name)
+                    }
+            } finally {
+                isRequestingRatingsNextPage = false
             }
         }
     }

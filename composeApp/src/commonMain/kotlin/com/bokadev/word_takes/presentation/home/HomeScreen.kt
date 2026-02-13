@@ -10,11 +10,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
@@ -27,6 +31,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import llc.amplitudo.cerovo.ui.theme.WordTakesTheme
 import org.koin.compose.viewmodel.koinViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     showSnackBar: (String) -> Unit,
@@ -56,8 +61,14 @@ fun HomeScreen(
             }
     }
 
-    // ✅ Keep latest state for the coroutine collectors
     val latestState by rememberUpdatedState(newValue = state)
+
+
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
+    val scope = rememberCoroutineScope()
+
 
     LaunchedEffect(listState) {
         snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1 }
@@ -76,6 +87,26 @@ fun HomeScreen(
             }
     }
 
+
+    if (state.shouldShowRatingsBottomSheet) {
+        WordAllRatingsBottomSheet(
+            sheetState = sheetState,
+            word = state.selectedWord,
+            state = state,
+            onDismiss = {
+                viewModel.onEvent(
+                    HomeEvent.ToggleBottomSheet(
+                        wordId = -1,
+                        selectedWord = ""
+                    )
+                )
+            },
+            onLoadNext = {
+                viewModel.onEvent(HomeEvent.LoadRatingsNextPage)
+            }
+
+        )
+    }
 
     LazyColumn(
         state = listState,
@@ -107,6 +138,14 @@ fun HomeScreen(
                 wordItem = word,
                 onRateClick = {
                     viewModel.onEvent(HomeEvent.OnRateWordClick(wordId = word.id, reaction = it))
+                },
+                onSeeRatingsClick = { wordId, word ->
+                    viewModel.onEvent(
+                        HomeEvent.ToggleBottomSheet(
+                            wordId = wordId,
+                            selectedWord =  word
+                        )
+                    )
                 }
             )
         }

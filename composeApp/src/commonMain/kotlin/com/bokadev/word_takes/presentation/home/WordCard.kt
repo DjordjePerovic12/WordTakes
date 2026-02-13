@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,16 +19,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bokadev.word_takes.core.utils.formatCreatedAt
+import com.bokadev.word_takes.core.utils.noRippleClickable
 import com.bokadev.word_takes.core.utils.reactionsToGradient
-import com.bokadev.word_takes.data.remote.dto.RateWordRequestDto
-import com.bokadev.word_takes.data.remote.dto.ReactionRequestDto
-import com.bokadev.word_takes.domain.model.Reactions
+import com.bokadev.word_takes.data.remote.dto.ReactionsEnum
 import com.bokadev.word_takes.domain.model.WordItem
 import llc.amplitudo.cerovo.ui.theme.WordTakesTheme
 import org.jetbrains.compose.resources.vectorResource
@@ -41,21 +39,33 @@ import word_takes.composeapp.generated.resources.party_popper
 fun WordCard(
     modifier: Modifier = Modifier,
     wordItem: WordItem,
-    onRateClick: (String) -> Unit
+    onRateClick: (String) -> Unit,
+    onSeeRatingsClick: (Int, String) -> Unit
 ) {
     val votesCount =
-        wordItem.reactions.bad + wordItem.reactions.good + wordItem.reactions.awful + wordItem.reactions.amazing + wordItem.reactions.skipped
+        wordItem.reactions.bad + wordItem.reactions.good + wordItem.reactions.awful + wordItem.reactions.amazing + wordItem.reactions.skipped!!
 
-    val decideLabel = when (votesCount) {
+    val isSeeRatingsClickable = when (votesCount) {
         1 -> {
-            if (wordItem.myReaction == ReactionRequestDto.SKIPPED.name.lowercase()) "No one rated the word yet"
+            false
+        }
+
+        2 -> if (wordItem.myReaction == ReactionsEnum.SKIPPED.name.lowercase()) true else if (wordItem.reactions.skipped == 1) false else
+            true
+
+        else -> true
+    }
+
+    val decideLabel = when(votesCount) {
+        1 -> {
+            if (wordItem.myReaction == ReactionsEnum.SKIPPED.name.lowercase()) "No one rated the word yet"
             else "You are the only one that rated the word"
         }
 
-        2 -> if (wordItem.myReaction == ReactionRequestDto.SKIPPED.name.lowercase()) "1 person rated the word" else if(wordItem.reactions.skipped == 1) "You are the only one that rated the word" else
+        2 -> if (wordItem.myReaction == ReactionsEnum.SKIPPED.name.lowercase()) "1 person rated the word" else if (wordItem.reactions.skipped == 1) "You are the only one that rated the word" else
             "You and 1 other person rated the word"
 
-        else -> if (wordItem.myReaction == ReactionRequestDto.SKIPPED.name.lowercase()) "${votesCount - wordItem.reactions.skipped - 1}  people rated this word" else
+        else -> if (wordItem.myReaction == ReactionsEnum.SKIPPED.name.lowercase()) "${votesCount - wordItem.reactions.skipped - 1}  people rated this word" else
             "You and ${votesCount - wordItem.reactions.skipped - 1}  others rated this word"
     }
     Column(
@@ -64,7 +74,7 @@ fun WordCard(
         modifier = Modifier
             .clip(RoundedCornerShape(20.dp))
             .background(
-                if (wordItem.myReaction == null || (wordItem.myReaction == ReactionRequestDto.SKIPPED.name.lowercase() && votesCount == 0))
+                if (wordItem.myReaction == null || (wordItem.myReaction == ReactionsEnum.SKIPPED.name.lowercase() && votesCount == 0))
 //                    Brush.linearGradient(
 //                        colors = listOf(
 //                            WordTakesTheme.colors.wordTakesWhite.copy(.2f),
@@ -115,7 +125,7 @@ fun WordCard(
             if (wordItem.myReaction == null)
                 Button(
                     onClick = {
-                        onRateClick(ReactionRequestDto.SKIPPED.name.lowercase())
+                        onRateClick(ReactionsEnum.SKIPPED.name.lowercase())
                     },
                     modifier = Modifier.wrapContentWidth()
                         .height(45.dp)
@@ -144,6 +154,9 @@ fun WordCard(
         }
 
 
+        Spacer(modifier = Modifier.height(10.dp))
+
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
@@ -156,6 +169,8 @@ fun WordCard(
             )
         }
 
+        Spacer(modifier = Modifier.height(10.dp))
+
 
         when (wordItem.myReaction) {
             null -> {
@@ -166,7 +181,7 @@ fun WordCard(
                 ) {
                     Button(
                         onClick = {
-                            onRateClick(ReactionRequestDto.GOOD.name.lowercase())
+                            onRateClick(ReactionsEnum.GOOD.name.lowercase())
                         },
                         modifier = Modifier.wrapContentWidth()
                             .height(45.dp)
@@ -199,7 +214,7 @@ fun WordCard(
 
                     Button(
                         onClick = {
-                            onRateClick(ReactionRequestDto.AMAZING.name.lowercase())
+                            onRateClick(ReactionsEnum.AMAZING.name.lowercase())
 
                         },
                         modifier = Modifier.wrapContentWidth()
@@ -233,7 +248,7 @@ fun WordCard(
 
                     Button(
                         onClick = {
-                            onRateClick(ReactionRequestDto.BAD.name.lowercase())
+                            onRateClick(ReactionsEnum.BAD.name.lowercase())
 
                         },
                         modifier = Modifier.wrapContentWidth()
@@ -267,7 +282,7 @@ fun WordCard(
 
                     Button(
                         onClick = {
-                            onRateClick(ReactionRequestDto.AWFUL.name.lowercase())
+                            onRateClick(ReactionsEnum.AWFUL.name.lowercase())
 
                         },
                         modifier = Modifier.wrapContentWidth()
@@ -317,11 +332,14 @@ fun WordCard(
                                 )
                         )
                         .padding(15.dp)
+                        .noRippleClickable {
+                            if(isSeeRatingsClickable) onSeeRatingsClick(wordItem.id, wordItem.word)
+                        }
 
                 ) {
 
                     Text(
-                        decideLabel,
+                        text = decideLabel,
                         color = WordTakesTheme.colors.wordTakesWhite,
                         style = WordTakesTheme.typogrpahy.geistSemiBold14
                     )

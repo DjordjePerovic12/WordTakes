@@ -4,6 +4,7 @@ import com.bokadev.word_takes.core.networking.NetworkError
 import com.bokadev.word_takes.core.networking.Resource
 import com.bokadev.word_takes.data.remote.dto.PostTakeRequestDto
 import com.bokadev.word_takes.data.remote.dto.RateWordRequestDto
+import com.bokadev.word_takes.domain.model.PaginatedRatings
 import com.bokadev.word_takes.domain.model.PaginatedWords
 
 interface WordsRepository {
@@ -20,4 +21,10 @@ interface WordsRepository {
         wordId: Int,
         body: RateWordRequestDto
     ): Resource<Unit, NetworkError, String?>
+
+    suspend fun getAllRatings(
+        wordId: Int,
+        page: Int = 1,
+        perPage: Int = 20
+    ): Resource<PaginatedRatings, NetworkError, String?>
 }

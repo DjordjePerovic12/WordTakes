@@ -3,5 +3,5 @@ package com.bokadev.word_takes.domain.model
 data class User(
     val id: Int,
     val name: String,
-    val email: String
+    val email: String? = null
 )

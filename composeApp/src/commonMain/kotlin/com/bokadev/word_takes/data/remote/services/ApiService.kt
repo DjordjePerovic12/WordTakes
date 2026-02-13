@@ -4,6 +4,7 @@ import com.bokadev.word_takes.core.networking.NetworkError
 import com.bokadev.word_takes.core.networking.Resource
 import com.bokadev.word_takes.data.remote.dto.LoginRequestDto
 import com.bokadev.word_takes.data.remote.dto.AuthInfoResponseDto
+import com.bokadev.word_takes.data.remote.dto.PaginatedRatingsResponseDto
 import com.bokadev.word_takes.data.remote.dto.PostTakeRequestDto
 import com.bokadev.word_takes.data.remote.dto.RateWordRequestDto
 import com.bokadev.word_takes.data.remote.dto.RegisterRequestDto
@@ -34,5 +35,12 @@ interface ApiService {
         wordId: Int,
         rateWordRequestDto: RateWordRequestDto
     ): Resource<Unit, NetworkError, String?>
+
+
+    suspend fun getAllRatings(
+        wordId: Int,
+        page: Int,
+        perPage: Int
+    ): Resource<PaginatedRatingsResponseDto, NetworkError, String?>
 
 }
