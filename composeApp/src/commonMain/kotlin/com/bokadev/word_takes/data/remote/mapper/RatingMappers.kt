@@ -7,7 +7,7 @@ import org.koin.core.qualifier.named
 
 
 fun ReactionsDto.toDomain(): Reactions =
-    Reactions(good = good, amazing = amazing, bad = bad, awful = awful)
+    Reactions(good = good, amazing = amazing, bad = bad, awful = awful, skipped = skipped)
 
 fun PaginationMetaDto.toDomain(): PaginationMeta =
     PaginationMeta(

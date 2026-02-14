@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class WordDto(
     val id: Int,
-    val name: String,
+    val user: UserDto,
     @SerialName("created_at")
     val createdAt: String,
     val word: String,

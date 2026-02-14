@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetValue
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,16 +27,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.bokadev.word_takes.core.navigation.Screen
 import com.bokadev.word_takes.core.utils.observeWithLifecycle
+import com.bokadev.word_takes.presentation.single_user.SingleUserWordEvent
+import com.bokadev.word_takes.presentation.single_user.SingleUserWordsViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
 import llc.amplitudo.cerovo.ui.theme.WordTakesTheme
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(
+fun SingleUserWordsScreen(
     showSnackBar: (String) -> Unit,
-    viewModel: HomeViewModel = koinViewModel(),
+    viewModel: SingleUserWordsViewModel = koinViewModel(),
 
     ) {
 
@@ -48,7 +52,7 @@ fun HomeScreen(
 
     val listState = rememberLazyListState()
 
-    // ✅ Keep a stable, up-to-date reference to the function (do NOT call it here)
+
     val latestLoadNextPage by rememberUpdatedState(newValue = { viewModel.executeGetWordsNextPage() })
 
     var userHasScrolled by remember { mutableStateOf(false) }
@@ -97,11 +101,11 @@ fun HomeScreen(
             isRatingsLoadingNextPage = state.isRatingsLoadingNextPage,
             onDismiss = {
                 viewModel.onEvent(
-                    HomeEvent.DismissBottomSheet
+                    SingleUserWordEvent.DismissBottomSheet
                 )
             },
             onLoadNext = {
-                viewModel.onEvent(HomeEvent.LoadRatingsNextPage)
+                viewModel.onEvent(SingleUserWordEvent.LoadRatingsNextPage)
             }
 
         )
@@ -120,15 +124,13 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(50.dp))
         }
 
+        val decideText = if(state.currentUserId == state.items.firstOrNull()?.user?.id) "Your takes" else
+            "${state.items.firstOrNull()?.user?.name}'s takes"
         item {
-            PostTakeItem(
-                state = state,
-                onWordChange = {
-                    viewModel.onEvent(HomeEvent.OnWordChange(it))
-                },
-                onSubmitClick = {
-                    viewModel.onEvent(HomeEvent.OnSubmitClick)
-                }
+            Text(
+                text = decideText,
+                color = WordTakesTheme.colors.wordTakesWhite,
+                style = WordTakesTheme.typogrpahy.geistSemiBold32
             )
         }
 
@@ -136,18 +138,23 @@ fun HomeScreen(
             WordCard(
                 wordItem = word,
                 onRateClick = {
-                    viewModel.onEvent(HomeEvent.OnRateWordClick(wordId = word.id, reaction = it))
-                },
-                onSeeRatingsClick = { wordId, word ->
                     viewModel.onEvent(
-                        HomeEvent.OpenBottomSheet(
-                            wordId = wordId,
-                            selectedWord = word
+                        SingleUserWordEvent.OnRateWordClick(
+                            wordId = word.id,
+                            reaction = it
                         )
                     )
                 },
                 onUserNameClick = {
-                    viewModel.onEvent(HomeEvent.OnUserNameClick(it))
+
+                },
+                onSeeRatingsClick = { wordId, word ->
+                    viewModel.onEvent(
+                        SingleUserWordEvent.OpenBottomSheet(
+                            wordId = wordId,
+                            selectedWord = word
+                        )
+                    )
                 }
             )
         }

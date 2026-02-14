@@ -169,4 +169,20 @@ class KtorApiService(
     }
 
 
+    override suspend fun getWordsByUserId(
+        userId: Int,
+        page: Int,
+        perPage: Int
+    ): Resource<WordsPageResponseDto, NetworkError, String?> {
+        return get(
+            path = "/api/users/{user}/words",
+            params = mapOf(
+                "user" to userId.toString(),
+            ),
+            query = mapOf(
+                "page" to page.toString(),
+                "per_page" to perPage.toString()
+            )
+        )
+    }
 }

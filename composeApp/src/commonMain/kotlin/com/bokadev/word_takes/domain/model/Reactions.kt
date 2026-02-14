@@ -5,7 +5,7 @@ data class Reactions(
     val amazing: Int,
     val bad: Int,
     val awful: Int,
-    val skipped: Int? = null
+    val skipped: Int
 ) {
-    val total: Int get() = good + amazing + bad + awful
+    val total: Int get() = good + amazing + bad + awful + skipped
 }

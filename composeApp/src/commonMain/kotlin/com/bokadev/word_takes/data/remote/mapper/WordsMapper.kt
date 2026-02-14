@@ -1,6 +1,7 @@
 import com.bokadev.word_takes.data.remote.dto.ReactionsDto
 import com.bokadev.word_takes.data.remote.dto.WordDto
 import com.bokadev.word_takes.data.remote.dto.WordsPageResponseDto
+import com.bokadev.word_takes.data.remote.mapper.toDomain
 import com.bokadev.word_takes.domain.model.PaginatedWords
 import com.bokadev.word_takes.domain.model.PaginationLinks
 import com.bokadev.word_takes.domain.model.PaginationMeta
@@ -28,7 +29,7 @@ fun WordsPageResponseDto.toDomain(): PaginatedWords {
 fun WordDto.toDomain(): WordItem =
     WordItem(
         id = id,
-        name = name,
+        user = user.toDomain(),
         createdAtIso = createdAt,
         word = word,
         reactions = reactions.toDomain(),

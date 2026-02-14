@@ -27,4 +27,10 @@ interface WordsRepository {
         page: Int = 1,
         perPage: Int = 20
     ): Resource<PaginatedRatings, NetworkError, String?>
+
+    suspend fun getWordsByUserId(
+        userId: Int,
+        page: Int = 1,
+        perPage: Int = 20
+    ): Resource<PaginatedWords, NetworkError, String?>
 }

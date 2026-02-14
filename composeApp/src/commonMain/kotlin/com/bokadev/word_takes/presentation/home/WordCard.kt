@@ -40,10 +40,11 @@ fun WordCard(
     modifier: Modifier = Modifier,
     wordItem: WordItem,
     onRateClick: (String) -> Unit,
+    onUserNameClick: (Int) -> Unit,
     onSeeRatingsClick: (Int, String) -> Unit
 ) {
     val votesCount =
-        wordItem.reactions.bad + wordItem.reactions.good + wordItem.reactions.awful + wordItem.reactions.amazing + wordItem.reactions.skipped!!
+        wordItem.reactions.bad + wordItem.reactions.good + wordItem.reactions.awful + wordItem.reactions.amazing + wordItem.reactions.skipped
 
     val isSeeRatingsClickable = when (votesCount) {
         1 -> {
@@ -56,7 +57,7 @@ fun WordCard(
         else -> true
     }
 
-    val decideLabel = when(votesCount) {
+    val decideLabel = when (votesCount) {
         1 -> {
             if (wordItem.myReaction == ReactionsEnum.SKIPPED.name.lowercase()) "No one rated the word yet"
             else "You are the only one that rated the word"
@@ -65,7 +66,9 @@ fun WordCard(
         2 -> if (wordItem.myReaction == ReactionsEnum.SKIPPED.name.lowercase()) "1 person rated the word" else if (wordItem.reactions.skipped == 1) "You are the only one that rated the word" else
             "You and 1 other person rated the word"
 
-        else -> if (wordItem.myReaction == ReactionsEnum.SKIPPED.name.lowercase()) "${votesCount - wordItem.reactions.skipped - 1}  people rated this word" else
+        else -> if (wordItem.myReaction == ReactionsEnum.SKIPPED.name.lowercase() && wordItem.reactions.skipped == 1) "${votesCount - 1}  people rated this word" else if (wordItem.myReaction == ReactionsEnum.SKIPPED.name.lowercase() && wordItem.reactions.skipped > 1)
+            "${votesCount - wordItem.reactions.skipped}  people rated this word"
+        else
             "You and ${votesCount - wordItem.reactions.skipped - 1}  others rated this word"
     }
     Column(
@@ -108,9 +111,13 @@ fun WordCard(
             modifier = Modifier.fillMaxWidth()
         ) {
 
-            Column(verticalArrangement = Arrangement.SpaceBetween) {
+            Column(
+                verticalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.noRippleClickable {
+                    onUserNameClick(wordItem.user.id)
+                }) {
                 Text(
-                    text = wordItem.name,
+                    text = wordItem.user.name,
                     color = WordTakesTheme.colors.backgroundPrimary,
                     style = WordTakesTheme.typogrpahy.geistBold18
                 )
@@ -333,7 +340,7 @@ fun WordCard(
                         )
                         .padding(15.dp)
                         .noRippleClickable {
-                            if(isSeeRatingsClickable) onSeeRatingsClick(wordItem.id, wordItem.word)
+                            if (isSeeRatingsClickable) onSeeRatingsClick(wordItem.id, wordItem.word)
                         }
 
                 ) {

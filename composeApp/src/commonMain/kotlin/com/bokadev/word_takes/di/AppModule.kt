@@ -15,6 +15,7 @@ import com.bokadev.word_takes.domain.repository.WordsRepository
 import com.bokadev.word_takes.presentation.home.HomeViewModel
 import com.bokadev.word_takes.presentation.login.LoginViewModel
 import com.bokadev.word_takes.presentation.register.RegisterViewModel
+import com.bokadev.word_takes.presentation.single_user.SingleUserWordsViewModel
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
@@ -33,6 +34,7 @@ val appModule = module {
     viewModelOf(::MainViewModel)
     viewModelOf(::RegisterViewModel)
     viewModelOf(::HomeViewModel)
+    viewModelOf(::SingleUserWordsViewModel)
     singleOf(::KtorApiService) bind ApiService::class
     singleOf(::AuthRepositoryImpl) bind AuthRepository::class
     singleOf(::WordsRepositoryImpl) bind WordsRepository::class

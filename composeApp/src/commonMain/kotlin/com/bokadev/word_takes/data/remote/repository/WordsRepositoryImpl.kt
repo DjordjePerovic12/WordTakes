@@ -38,9 +38,25 @@ class WordsRepositoryImpl(
         )
     }
 
-    override suspend fun getAllRatings(wordId: Int, page: Int, perPage: Int): Resource<PaginatedRatings, NetworkError, String?> {
+    override suspend fun getAllRatings(
+        wordId: Int,
+        page: Int,
+        perPage: Int
+    ): Resource<PaginatedRatings, NetworkError, String?> {
         return apiService.getAllRatings(
             wordId = wordId,
+            page = page,
+            perPage = perPage
+        ).map { it.toDomain() }
+    }
+
+    override suspend fun getWordsByUserId(
+        userId: Int,
+        page: Int,
+        perPage: Int
+    ): Resource<PaginatedWords, NetworkError, String?> {
+        return apiService.getWordsByUserId(
+            userId = userId,
             page = page,
             perPage = perPage
         ).map { it.toDomain() }

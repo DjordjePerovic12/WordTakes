@@ -1,37 +1,46 @@
-package com.bokadev.word_takes.presentation.home
+package com.bokadev.word_takes.presentation.single_user
 
 
-import androidx.compose.ui.text.input.TextFieldValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
+import com.bokadev.word_takes.MainEvent
 import com.bokadev.word_takes.core.navigation.Screen
 import com.bokadev.word_takes.core.navigation.utils.Navigator
 import com.bokadev.word_takes.core.networking.onError
 import com.bokadev.word_takes.core.networking.onSuccess
-import com.bokadev.word_takes.data.remote.dto.PostTakeRequestDto
 import com.bokadev.word_takes.data.remote.dto.RateWordRequestDto
 import com.bokadev.word_takes.domain.repository.DataStoreRepository
 import com.bokadev.word_takes.domain.repository.WordsRepository
+import com.bokadev.word_takes.presentation.home.HomeEvent
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.Boolean
+import kotlin.Int
+import kotlin.String
+import kotlin.collections.plus
 
 
-class HomeViewModel(
+class SingleUserWordsViewModel(
     private val wordsRepository: WordsRepository,
     private val dataStoreRepository: DataStoreRepository,
-    private val navigator: Navigator
+    private val navigator: Navigator,
+    val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+
+    val route: Screen.SingleUserWordsScreen = savedStateHandle.toRoute()
+
+    val userId: Int = route.userId
 
 
     private var hasLoadedInitialData = false
@@ -47,15 +56,15 @@ class HomeViewModel(
     private var lastRequestedPage: Int? = 0
 
 
-    private var didLoadRatingsFirstPage = false
     private var isRequestingRatingsNextPage = false
     private var lastRequestedRatingsPage: Int? = 0
-    private val _state = MutableStateFlow(HomeState())
+    private val _state = MutableStateFlow(SingleUserWordsState())
+
 
     val state = _state
         .onStart {
             if (!hasLoadedInitialData) {
-                observeWordValidation()
+                observeSession()
                 executeGetWordsFirstPage()
                 hasLoadedInitialData = true
             }
@@ -66,64 +75,26 @@ class HomeViewModel(
             initialValue = _state.value
         )
 
-    private val isWordValidFlow = state
-        .map { it.myWord.text.trim() }
-        .distinctUntilChanged()
-        .map { it.length >= 3 }
-        .distinctUntilChanged()
 
-
-    private fun observeWordValidation() {
-        isWordValidFlow
-            .onEach { isValid ->
-                _state.update {
-                    it.copy(
-                        shouldEnableSubmitButton = isValid,
-                        isWordValid = isValid
-                    )
-                }
-            }
-            .launchIn(viewModelScope)
-    }
-
-
-    fun onEvent(event: HomeEvent) {
+    fun onEvent(event: SingleUserWordEvent) {
         when (event) {
-            HomeEvent.OnSubmitClick -> {
-                executePostTake()
-            }
+            SingleUserWordEvent.Refresh -> refreshFirstPage()
+            SingleUserWordEvent.LoadNextPage -> executeGetWordsNextPage()
 
-            is HomeEvent.OnWordChange -> {
-                _state.update {
-                    it.copy(myWord = event.word)
-                }
-            }
-
-            HomeEvent.Refresh -> {
-
-            }
-            HomeEvent.LoadNextPage -> executeGetWordsNextPage()
-
-            is HomeEvent.OnRateWordClick -> {
+            is SingleUserWordEvent.OnRateWordClick -> {
                 executeRateWord(
                     wordId = event.wordId,
                     reaction = event.reaction
                 )
             }
 
-            is HomeEvent.OnUserNameClick -> {
-                viewModelScope.launch {
-                    navigator.navigateTo(Screen.SingleUserWordsScreen(event.userId))
-                }
-            }
-
-            is HomeEvent.OnSeeRatingsClick -> {
+            is SingleUserWordEvent.OnSeeRatingsClick -> {
                 _state.update {
                     it.copy(selectedWord = event.selectedWord)
                 }
             }
 
-            is HomeEvent.OpenBottomSheet -> {
+            is SingleUserWordEvent.OpenBottomSheet -> {
                 _state.update {
                     it.copy(
                         shouldShowRatingsBottomSheet = true,
@@ -135,7 +106,7 @@ class HomeViewModel(
             }
 
 
-            HomeEvent.DismissBottomSheet -> {
+            SingleUserWordEvent.DismissBottomSheet -> {
                 _state.update {
                     it.copy(
                         selectedWord = "",
@@ -148,45 +119,13 @@ class HomeViewModel(
             }
 
 
-            is HomeEvent.LoadRatingsNextPage -> {
+            is SingleUserWordEvent.LoadRatingsNextPage -> {
                 executeGetRatingsNextPage()
             }
         }
     }
 
-    private fun executePostTake() {
-        _state.update {
-            it.copy(isSubmitInProgress = true)
-        }
-        viewModelScope.launch {
-            wordsRepository.postTake(
-                PostTakeRequestDto(
-                    state.value.myWord.text
-                )
-            ).onSuccess {
-                executeGetWordsFirstPage(force = true)
-//                refreshFirstPage()
-                _state.update {
-                    it.copy(
-                        isSubmitInProgress = false,
-                        myWord = TextFieldValue()
-                    )
-                }
-
-                _snackBarChannel.send("Word posted successfully")
-            }.onError { networkError, message ->
-                _snackBarChannel.send(message ?: networkError.name)
-                _state.update {
-                    it.copy(isSubmitInProgress = false)
-                }
-
-            }
-        }
-    }
-
-
     fun refreshFirstPage() = executeGetWordsFirstPage(force = true)
-
     private fun executeGetWordsFirstPage(force: Boolean = false) {
         // same logic as Outlet: reset paging flags
         isRequestingNextPage = false
@@ -208,8 +147,11 @@ class HomeViewModel(
                 )
             }
 
-
-            wordsRepository.getAllWords(page = 1, perPage = state.value.perPage)
+            wordsRepository.getWordsByUserId(
+                userId = userId,
+                page = 1,
+                perPage = state.value.perPage
+            )
                 .onSuccess { response ->
                     _state.update { s ->
                         // If you later add IDs, prefer distinctBy { it.id }
@@ -253,7 +195,7 @@ class HomeViewModel(
             try {
                 _state.update { it.copy(isLoadingNextPage = true, error = null) }
 
-                wordsRepository.getAllWords(page = nextPage, perPage = s.perPage)
+                wordsRepository.getWordsByUserId(userId = userId, page = nextPage, perPage = s.perPage)
                     .onSuccess { response ->
                         _state.update { current ->
                             // append, and (optionally) dedupe
@@ -278,31 +220,33 @@ class HomeViewModel(
     }
 
     private fun executeRateWord(wordId: Int, reaction: String) {
-        // ✅ prevent double fire
-        if (_state.value.isRateInProgress) return
-
+        _state.update {
+            it.copy(isRateInProgress = true)
+        }
         viewModelScope.launch {
-            try {
-                _state.update { it.copy(isRateInProgress = true) }
-
-                wordsRepository.rateWord(
-                    wordId = wordId,
-                    body = RateWordRequestDto(reaction = reaction)
+            wordsRepository.rateWord(
+                wordId = wordId,
+                body = RateWordRequestDto(
+                    reaction = reaction
                 )
-                    .onSuccess {
-                        // ✅ refresh only once (and after POST completes)
-                        executeGetWordsFirstPage(force = true)
-                        _snackBarChannel.send("Rated successfully")
-                    }
-                    .onError { networkError, message ->
-                        _snackBarChannel.send(message ?: networkError.name)
-                    }
-            } finally {
-                _state.update { it.copy(isRateInProgress = false) } // ✅ always reset
+            ).onSuccess {
+                refreshFirstPage()
+                _state.update {
+                    it.copy(
+                        isRateInProgress = false,
+                    )
+                }
+
+                _snackBarChannel.send("Word posted successfully")
+            }.onError { networkError, message ->
+                _snackBarChannel.send(message ?: networkError.name)
+                _state.update {
+                    it.copy(isRateInProgress = false)
+                }
+
             }
         }
     }
-
 
 
     private fun executeGetRatingsFirstPage(wordId: Int) {
@@ -393,6 +337,17 @@ class HomeViewModel(
                 isRequestingRatingsNextPage = false
             }
         }
+    }
+
+    private fun observeSession() {
+        dataStoreRepository
+            .observeAuthInfo()
+            .onEach { authInfo ->
+                _state.update {
+                    it.copy(currentUserId = authInfo?.user?.id)
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
 

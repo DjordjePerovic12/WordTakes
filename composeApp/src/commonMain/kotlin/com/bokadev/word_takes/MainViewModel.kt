@@ -2,6 +2,8 @@ package com.bokadev.word_takes
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.bokadev.word_takes.core.navigation.Screen
+import com.bokadev.word_takes.core.navigation.utils.Navigator
 import com.bokadev.word_takes.domain.repository.DataStoreRepository
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +18,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MainViewModel(
-    private val dataStoreRepository: DataStoreRepository
+    private val dataStoreRepository: DataStoreRepository,
+    private val navigator: Navigator
 ) : ViewModel() {
 
     private val evetChannel = Channel<MainEvent>()
@@ -37,6 +40,27 @@ class MainViewModel(
             initialValue = MainState()
         )
 
+    fun onEvent(event: MainEvent) {
+        when(event) {
+            MainEvent.OnSessionExpired -> {
+                viewModelScope.launch {
+                    navigator.navigateTo(Screen.LoginScreen)
+                }
+            }
+
+            MainEvent.OnProfileClick -> {
+                viewModelScope.launch {
+                    navigator.navigateTo(Screen.SingleUserWordsScreen(state.value.currentUserId ?: -1)) {
+                        launchSingleTop = true
+                        popUpTo(Screen.HomeScreen)
+                    }
+                }
+            }
+        }
+
+
+    }
+
 
     private var previousRefreshToken: String? = null
 
@@ -53,10 +77,14 @@ class MainViewModel(
     }
 
 
+
     private fun observeSession() {
         dataStoreRepository
             .observeAuthInfo()
             .onEach { authInfo ->
+                _state.update {
+                    it.copy(currentUserId = authInfo?.user?.id)
+                }
                 val isSessionExpired = previousRefreshToken != null
                 if (isSessionExpired) {
                     dataStoreRepository.set(null)

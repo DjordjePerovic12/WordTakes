@@ -16,6 +16,9 @@ sealed class HomeEvent {
     ) : HomeEvent()
 
 
+    data class OnUserNameClick(val userId: Int): HomeEvent()
+
+
     data class OnSeeRatingsClick(val selectedWord: String) : HomeEvent()
     data class OpenBottomSheet(val wordId: Int, val selectedWord: String) : HomeEvent()
 

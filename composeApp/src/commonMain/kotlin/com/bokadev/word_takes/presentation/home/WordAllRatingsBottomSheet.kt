@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bokadev.word_takes.core.utils.noRippleClickable
 import com.bokadev.word_takes.data.remote.dto.ReactionsEnum
+import com.bokadev.word_takes.domain.model.Rating
 import kotlinx.coroutines.flow.distinctUntilChanged
 import llc.amplitudo.cerovo.ui.theme.WordTakesTheme
 import org.jetbrains.compose.resources.vectorResource
@@ -42,7 +43,9 @@ import word_takes.composeapp.generated.resources.x
 @Composable
 fun WordAllRatingsBottomSheet(
     sheetState: SheetState,
-    state: HomeState,
+    ratingsItems: List<Rating>,
+    canLoadMoreRatings: Boolean,
+    isRatingsLoadingNextPage: Boolean,
     word: String,
     onDismiss: () -> Unit,
     onLoadNext: () -> Unit
@@ -50,9 +53,7 @@ fun WordAllRatingsBottomSheet(
 
     val listState = rememberLazyListState()
 
-    // ✅ stable function + latest state for collectors
     val latestLoadNext by rememberUpdatedState(newValue = onLoadNext)
-    val latestState by rememberUpdatedState(newValue = state)
 
     var userHasScrolled by remember { mutableStateOf(false) }
 
@@ -73,7 +74,7 @@ fun WordAllRatingsBottomSheet(
                 val threshold = 3
                 val nearEnd = lastVisibleIndex >= total - 1 - threshold
 
-                if (nearEnd && latestState.canLoadMoreRatings && !latestState.isRatingsLoadingNextPage) {
+                if (nearEnd && canLoadMoreRatings && !isRatingsLoadingNextPage) {
                     latestLoadNext()
                 }
             }
@@ -112,7 +113,7 @@ fun WordAllRatingsBottomSheet(
                 letterSpacing = 20.sp
             )
 
-            state.ratingsItems.forEachIndexed { index, item ->
+            ratingsItems.forEachIndexed { index, item ->
 
                 val decideColor = when (item.reaction) {
                     ReactionsEnum.GOOD.name.lowercase() -> WordTakesTheme.colors.wordTakesGood
@@ -141,7 +142,7 @@ fun WordAllRatingsBottomSheet(
 
                 }
 
-                if (index < state.ratingsItems.lastIndex) {
+                if (index < ratingsItems.lastIndex) {
                     Spacer(modifier = Modifier.height(10.dp))
                     HorizontalDivider(
                         modifier = Modifier.background(WordTakesTheme.colors.wordTakesWhite)

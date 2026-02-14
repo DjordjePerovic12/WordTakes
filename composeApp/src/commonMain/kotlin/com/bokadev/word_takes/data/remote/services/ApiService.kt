@@ -43,4 +43,10 @@ interface ApiService {
         perPage: Int
     ): Resource<PaginatedRatingsResponseDto, NetworkError, String?>
 
+    suspend fun getWordsByUserId(
+        userId: Int,
+        page: Int,
+        perPage: Int
+    ): Resource<WordsPageResponseDto, NetworkError, String?>
+
 }
