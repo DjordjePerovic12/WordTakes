@@ -22,11 +22,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.bokadev.word_takes.core.utils.noRippleClickable
 import com.bokadev.word_takes.data.remote.dto.ReactionsEnum
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -34,6 +36,7 @@ import llc.amplitudo.cerovo.ui.theme.WordTakesTheme
 import org.jetbrains.compose.resources.vectorResource
 import word_takes.composeapp.generated.resources.Res
 import word_takes.composeapp.generated.resources.icon_eye_off
+import word_takes.composeapp.generated.resources.x
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,13 +87,10 @@ fun WordAllRatingsBottomSheet(
         shape = RoundedCornerShape(
             topStart = 16.dp, topEnd = 16.dp
         ),
-        contentColor = WordTakesTheme.colors.colorWhite,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(15.dp)
+        contentColor = WordTakesTheme.colors.colorWhite
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(15.dp, alignment = Alignment.Top),
+            verticalArrangement = Arrangement.spacedBy(10.dp, alignment = Alignment.Top),
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.background(WordTakesTheme.colors.backgroundPrimary)
                 .padding(horizontal = 20.dp)
@@ -98,7 +98,7 @@ fun WordAllRatingsBottomSheet(
 
             Spacer(modifier = Modifier.height(10.dp))
             Icon(
-                imageVector = vectorResource(Res.drawable.icon_eye_off),
+                imageVector = vectorResource(Res.drawable.x),
                 contentDescription = null,
                 modifier = Modifier.align(Alignment.End)
                     .noRippleClickable {
@@ -108,43 +108,47 @@ fun WordAllRatingsBottomSheet(
             Text(
                 text = word,
                 color = WordTakesTheme.colors.wordTakesWhite,
-                style = WordTakesTheme.typogrpahy.geistSemiBold24
+                style = WordTakesTheme.typogrpahy.geistSemiBold24,
+                letterSpacing = 20.sp
             )
 
-            state.ratingsItems.forEach {
+            state.ratingsItems.forEachIndexed { index, item ->
 
-                val decideColor = when (it.reaction) {
+                val decideColor = when (item.reaction) {
                     ReactionsEnum.GOOD.name.lowercase() -> WordTakesTheme.colors.wordTakesGood
                     ReactionsEnum.AMAZING.name.lowercase() -> WordTakesTheme.colors.wordTakesAmazing
                     ReactionsEnum.BAD.name.lowercase() -> WordTakesTheme.colors.wordTakesBad
                     ReactionsEnum.AWFUL.name.lowercase() -> WordTakesTheme.colors.wordTakesAwful
                     else -> WordTakesTheme.colors.colorWhite
                 }
-
+                Spacer(modifier = Modifier.height(8.dp))
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = it.user.name,
+                        text = item.user.name,
                         color = WordTakesTheme.colors.wordTakesWhite,
                         style = WordTakesTheme.typogrpahy.geistMedium18
                     )
 
                     Text(
-                        text = it.reaction.uppercase(),
+                        text = item.reaction.uppercase(),
                         color = decideColor,
-                        style = WordTakesTheme.typogrpahy.geistBold24
+                        style = WordTakesTheme.typogrpahy.geistBold18
                     )
+
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
-
-                HorizontalDivider(modifier = Modifier.background(WordTakesTheme.colors.wordTakesWhite))
-
+                if (index < state.ratingsItems.lastIndex) {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    HorizontalDivider(
+                        modifier = Modifier.background(WordTakesTheme.colors.wordTakesWhite)
+                    )
+                }
+                else Spacer(modifier = Modifier.height(12.dp))
             }
-
         }
     }
 }

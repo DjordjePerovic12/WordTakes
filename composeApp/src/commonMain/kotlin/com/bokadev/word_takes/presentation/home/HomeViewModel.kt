@@ -15,6 +15,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -113,17 +114,30 @@ class HomeViewModel(
                 }
             }
 
-            is HomeEvent.ToggleBottomSheet -> {
-                executeGetRatingsFirstPage(
-                    wordId = event.wordId
-                )
+            is HomeEvent.OpenBottomSheet -> {
                 _state.update {
                     it.copy(
-                        shouldShowRatingsBottomSheet = !state.value.shouldShowRatingsBottomSheet,
+                        shouldShowRatingsBottomSheet = true,
                         selectedWord = event.selectedWord
                     )
                 }
+
+                executeGetRatingsFirstPage(wordId = event.wordId)
             }
+
+
+            HomeEvent.DismissBottomSheet -> {
+                _state.update {
+                    it.copy(
+                        selectedWord = "",
+                        ratingsWordId = null,
+                        ratingsItems = emptyList(),
+                        ratingsTotals = null,
+                        shouldShowRatingsBottomSheet = false
+                    )
+                }
+            }
+
 
             is HomeEvent.LoadRatingsNextPage -> {
                 executeGetRatingsNextPage()
@@ -283,57 +297,51 @@ class HomeViewModel(
     }
 
 
-    private fun executeGetRatingsFirstPage(wordId: Int, force: Boolean = false) {
-        // reset paging flags
+    private fun executeGetRatingsFirstPage(wordId: Int) {
+
+        // 🔄 reset paging EVERY TIME
         isRequestingRatingsNextPage = false
         lastRequestedRatingsPage = 0
-
-        if (!force && didLoadRatingsFirstPage) return
-        didLoadRatingsFirstPage = true
 
         viewModelScope.launch {
             _state.update {
                 it.copy(
                     ratingsWordId = wordId,
-                    isRatingsLoading = it.ratingsItems.isEmpty(),
-                    isRatingsRefreshing = force && it.ratingsItems.isNotEmpty(),
-                    isRatingsLoadingNextPage = false,
                     ratingsItems = emptyList(),
                     ratingsTotals = null,
                     ratingsCurrentPage = 0,
-                    ratingsLastPage = 1
+                    ratingsLastPage = 1,
+                    isRatingsLoading = true,
+                    isRatingsRefreshing = false,
+                    isRatingsLoadingNextPage = false
                 )
             }
 
-            val perPage = state.value.ratingsPerPage
-
-            wordsRepository.getAllRatings(wordId = wordId, page = 1, perPage = perPage)
+            wordsRepository.getAllRatings(
+                wordId = wordId,
+                page = 1,
+                perPage = state.value.ratingsPerPage
+            )
                 .onSuccess { response ->
                     _state.update {
                         it.copy(
-                            ratingsWordId = wordId,
                             ratingsItems = response.items,
                             ratingsTotals = response.reactions,
                             ratingsCurrentPage = response.meta.currentPage,
                             ratingsLastPage = response.meta.lastPage,
-                            isRatingsLoading = false,
-                            isRatingsRefreshing = false,
-                            isRatingsLoadingNextPage = false
+                            isRatingsLoading = false
                         )
                     }
                 }
                 .onError { networkError, message ->
                     _state.update {
-                        it.copy(
-                            isRatingsLoading = false,
-                            isRatingsRefreshing = false,
-                            isRatingsLoadingNextPage = false
-                        )
+                        it.copy(isRatingsLoading = false)
                     }
                     _snackBarChannel.send(message ?: networkError.name)
                 }
         }
     }
+
 
     fun executeGetRatingsNextPage() {
         val s = state.value

@@ -95,10 +95,7 @@ fun HomeScreen(
             state = state,
             onDismiss = {
                 viewModel.onEvent(
-                    HomeEvent.ToggleBottomSheet(
-                        wordId = -1,
-                        selectedWord = ""
-                    )
+                    HomeEvent.DismissBottomSheet
                 )
             },
             onLoadNext = {
@@ -141,9 +138,9 @@ fun HomeScreen(
                 },
                 onSeeRatingsClick = { wordId, word ->
                     viewModel.onEvent(
-                        HomeEvent.ToggleBottomSheet(
+                        HomeEvent.OpenBottomSheet(
                             wordId = wordId,
-                            selectedWord =  word
+                            selectedWord = word
                         )
                     )
                 }
