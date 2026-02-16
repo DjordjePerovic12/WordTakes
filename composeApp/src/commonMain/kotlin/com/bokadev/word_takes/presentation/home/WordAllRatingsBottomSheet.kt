@@ -22,7 +22,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -36,7 +35,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import llc.amplitudo.cerovo.ui.theme.WordTakesTheme
 import org.jetbrains.compose.resources.vectorResource
 import word_takes.composeapp.generated.resources.Res
-import word_takes.composeapp.generated.resources.icon_eye_off
 import word_takes.composeapp.generated.resources.x
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -33,3 +33,8 @@ inline fun <reified T> Flow<T>.observeWithLifecycle(
         }
     }
 }
+
+fun String.breakIntoLines(): String =
+    trim()
+        .split(Regex("\\s+"))
+        .joinToString("\n")

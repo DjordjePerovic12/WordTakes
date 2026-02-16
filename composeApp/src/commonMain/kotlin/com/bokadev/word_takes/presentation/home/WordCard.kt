@@ -20,8 +20,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.bokadev.word_takes.core.utils.breakIntoLines
 import com.bokadev.word_takes.core.utils.formatCreatedAt
 import com.bokadev.word_takes.core.utils.noRippleClickable
 import com.bokadev.word_takes.core.utils.reactionsToGradient
@@ -169,10 +171,11 @@ fun WordCard(
             horizontalArrangement = Arrangement.Center
         ) {
             Text(
-                text = wordItem.word,
+                text = wordItem.word.breakIntoLines(),
                 color = WordTakesTheme.colors.backgroundPrimary,
                 style = WordTakesTheme.typogrpahy.geistSemiBold24,
-                letterSpacing = 20.sp
+                letterSpacing = 20.sp,
+                textAlign = TextAlign.Center
             )
         }
 

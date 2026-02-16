@@ -20,7 +20,6 @@ import com.bokadev.word_takes.core.components.WordTakesBottombAR
 import com.bokadev.word_takes.core.navigation.BaseAppNavigation
 import com.bokadev.word_takes.core.navigation.Screen
 import com.bokadev.word_takes.core.navigation.utils.Navigator
-import com.bokadev.word_takes.core.navigation.utils.ObserveAsEvents
 import com.bokadev.word_takes.core.utils.CustomModifiers
 import com.bokadev.word_takes.core.utils.rememberAppState
 import io.github.aakira.napier.Napier
