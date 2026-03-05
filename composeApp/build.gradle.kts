@@ -18,17 +18,17 @@ buildkonfig {
 //    http://192.168.1.141:8000 device,
 
     defaultConfigs{
-        buildConfigField(FieldSpec.Type.STRING, "BASE_URL", "http://10.0.2.2:8000")
+        buildConfigField(FieldSpec.Type.STRING, "BASE_URL", "https://word-takes.bokadev.me/")
     }
 
     defaultConfigs("dev") {
-        buildConfigField(FieldSpec.Type.STRING, "BASE_URL", "http://10.0.2.2:8000")
+        buildConfigField(FieldSpec.Type.STRING, "BASE_URL", "https://word-takes.bokadev.me/")
     }
     defaultConfigs("test") {
-        buildConfigField(FieldSpec.Type.STRING, "BASE_URL", "http://10.0.2.2:8000")
+        buildConfigField(FieldSpec.Type.STRING, "BASE_URL", "https://word-takes.bokadev.me/")
     }
     defaultConfigs("prod") {
-        buildConfigField(FieldSpec.Type.STRING, "BASE_URL", "http://10.0.2.2:8000")
+        buildConfigField(FieldSpec.Type.STRING, "BASE_URL", "https://word-takes.bokadev.me/")
     }
 }
 
