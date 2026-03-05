@@ -6,7 +6,8 @@ import androidx.navigation.compose.NavHost
 import com.bokadev.word_takes.core.navigation.destinations.homeScreenComposable
 import com.bokadev.word_takes.core.navigation.destinations.loginScreenComposable
 import com.bokadev.word_takes.core.navigation.destinations.registerScreenComposable
-import com.bokadev.word_takes.core.navigation.destinations.singleUserWordsScreen
+import com.bokadev.word_takes.core.navigation.destinations.singleUserWordsScreenComposable
+import com.bokadev.word_takes.core.navigation.destinations.statsScreenComposable
 import com.bokadev.word_takes.core.navigation.utils.NavType
 import com.bokadev.word_takes.core.navigation.utils.Navigator
 import com.bokadev.word_takes.core.navigation.utils.ObserveAsEvents
@@ -46,6 +47,7 @@ fun BaseAppNavigation(
         loginScreenComposable(showSnackBar = showSnackBar)
         homeScreenComposable(showSnackBar = showSnackBar)
         registerScreenComposable(showSnackBar = showSnackBar)
-        singleUserWordsScreen(showSnackBar = showSnackBar)
+        singleUserWordsScreenComposable(showSnackBar = showSnackBar)
+        statsScreenComposable(showSnackBar = showSnackBar)
     }
 }

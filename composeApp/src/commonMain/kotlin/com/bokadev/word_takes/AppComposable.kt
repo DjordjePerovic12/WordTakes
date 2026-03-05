@@ -66,6 +66,10 @@ fun AppComposable(
                 true
             }
 
+            navBackStackEntry?.destination?.hasRoute<Screen.StatsScreen>() == true -> {
+                true
+            }
+
             else -> false
         }
 
@@ -97,24 +101,14 @@ fun AppComposable(
                                 // If it wasn't in the back stack (e.g. process recreation), navigate to it
                                 if (!popped) {
                                     navigator.navigateTo(Screen.HomeScreen) {
-//                                            launchSingleTop = true
-//                                            popUpTo(Screen.ROOT) { inclusive = false }
+//
                                     }
                                 }
                             }
                         },
                         navigateToStats = {
-//                            scope.launch {
-//                                navigator.navigateTo(Screen.CategoriesScreen) {
-//                                    launchSingleTop = true
-//
-//                                    // Remove the existing CategoriesScreen entry (and its saved UI state)
-//                                    popUpTo(Screen.CategoriesScreen) {
-//                                        inclusive = true
-//                                    }
-//                                }
-//                            }
-
+                            selectedIndex = 1
+                            viewModel.onEvent(MainEvent.OnStatsClick)
                         },
                         navigateToProfile = {
                             selectedIndex = 2

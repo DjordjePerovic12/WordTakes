@@ -8,6 +8,8 @@ import com.bokadev.word_takes.data.remote.dto.PaginatedRatingsResponseDto
 import com.bokadev.word_takes.data.remote.dto.PostTakeRequestDto
 import com.bokadev.word_takes.data.remote.dto.RateWordRequestDto
 import com.bokadev.word_takes.data.remote.dto.RegisterRequestDto
+import com.bokadev.word_takes.data.remote.dto.StatsResponseDto
+import com.bokadev.word_takes.data.remote.dto.WordDto
 import com.bokadev.word_takes.data.remote.dto.WordsPageResponseDto
 
 interface ApiService {
@@ -48,5 +50,7 @@ interface ApiService {
         page: Int,
         perPage: Int
     ): Resource<WordsPageResponseDto, NetworkError, String?>
+
+    suspend fun getStats(): Resource<StatsResponseDto, NetworkError, String?>
 
 }

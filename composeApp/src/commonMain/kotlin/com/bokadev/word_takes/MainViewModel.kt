@@ -56,6 +56,16 @@ class MainViewModel(
                     }
                 }
             }
+
+
+            MainEvent.OnStatsClick -> {
+                viewModelScope.launch {
+                    navigator.navigateTo(Screen.StatsScreen) {
+                        launchSingleTop = true
+                        popUpTo(Screen.HomeScreen)
+                    }
+                }
+            }
         }
 
 

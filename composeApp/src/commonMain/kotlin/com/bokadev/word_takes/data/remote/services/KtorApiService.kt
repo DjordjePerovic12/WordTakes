@@ -11,6 +11,8 @@ import com.bokadev.word_takes.data.remote.dto.PaginatedRatingsResponseDto
 import com.bokadev.word_takes.data.remote.dto.PostTakeRequestDto
 import com.bokadev.word_takes.data.remote.dto.RateWordRequestDto
 import com.bokadev.word_takes.data.remote.dto.RegisterRequestDto
+import com.bokadev.word_takes.data.remote.dto.StatsResponseDto
+import com.bokadev.word_takes.data.remote.dto.WordDto
 import com.bokadev.word_takes.data.remote.dto.WordsPageResponseDto
 import io.ktor.client.HttpClient
 import io.ktor.client.request.delete
@@ -183,6 +185,13 @@ class KtorApiService(
                 "page" to page.toString(),
                 "per_page" to perPage.toString()
             )
+        )
+    }
+
+
+    override suspend fun getStats(): Resource<StatsResponseDto, NetworkError, String?> {
+        return get(
+            path = "api/stats/monthly"
         )
     }
 }

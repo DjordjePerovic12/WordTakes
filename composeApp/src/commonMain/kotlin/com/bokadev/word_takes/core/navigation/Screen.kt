@@ -20,6 +20,10 @@ sealed interface Screen {
     @Serializable
     data class SingleUserWordsScreen(val userId: Int) : Screen
 
+
+    @Serializable
+    data object StatsScreen : Screen
+
     @Serializable
     data object LobbyCreateScreen : Screen
 

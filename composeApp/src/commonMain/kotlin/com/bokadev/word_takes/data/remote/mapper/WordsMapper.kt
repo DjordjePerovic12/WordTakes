@@ -38,3 +38,16 @@ fun WordDto.toDomain(): WordItem =
 
 fun ReactionsDto.toDomain(): Reactions =
     Reactions(good = good, amazing = amazing, bad = bad, awful = awful, skipped = skipped)
+
+fun List<WordDto>.toDomainWords(): List<WordItem> {
+    return this.map { wordDto ->
+        WordItem(
+            id = wordDto.id,
+            user = wordDto.user.toDomain(),
+            createdAtIso = wordDto.createdAt,
+            word = wordDto.word,
+            reactions = wordDto.reactions.toDomain(),
+            myReaction = wordDto.myReaction
+        )
+    }
+}

@@ -6,6 +6,7 @@ import com.bokadev.word_takes.data.remote.dto.PostTakeRequestDto
 import com.bokadev.word_takes.data.remote.dto.RateWordRequestDto
 import com.bokadev.word_takes.domain.model.PaginatedRatings
 import com.bokadev.word_takes.domain.model.PaginatedWords
+import com.bokadev.word_takes.domain.model.WordItem
 
 interface WordsRepository {
     suspend fun postTake(
@@ -33,4 +34,6 @@ interface WordsRepository {
         page: Int = 1,
         perPage: Int = 20
     ): Resource<PaginatedWords, NetworkError, String?>
+
+    suspend fun getStats(): Resource<List<WordItem>,NetworkError, String?>
 }

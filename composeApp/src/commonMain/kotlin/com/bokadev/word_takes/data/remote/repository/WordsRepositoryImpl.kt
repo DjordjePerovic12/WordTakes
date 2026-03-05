@@ -9,8 +9,10 @@ import com.bokadev.word_takes.data.remote.mapper.toDomain
 import com.bokadev.word_takes.data.remote.services.ApiService
 import com.bokadev.word_takes.domain.model.PaginatedRatings
 import com.bokadev.word_takes.domain.model.PaginatedWords
+import com.bokadev.word_takes.domain.model.WordItem
 import com.bokadev.word_takes.domain.repository.WordsRepository
 import toDomain
+import toDomainWords
 
 class WordsRepositoryImpl(
     private val apiService: ApiService
@@ -61,4 +63,10 @@ class WordsRepositoryImpl(
             perPage = perPage
         ).map { it.toDomain() }
     }
+
+    override suspend fun getStats(): Resource<List<WordItem>, NetworkError, String?> {
+        return apiService.getStats().map { it.items.toDomainWords() }
+    }
+
+
 }

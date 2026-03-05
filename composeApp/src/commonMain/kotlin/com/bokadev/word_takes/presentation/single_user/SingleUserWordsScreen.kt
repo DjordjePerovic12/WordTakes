@@ -1,7 +1,8 @@
-package com.bokadev.word_takes.presentation.home
+package com.bokadev.word_takes.presentation.single_user
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,8 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bokadev.word_takes.core.utils.observeWithLifecycle
-import com.bokadev.word_takes.presentation.single_user.SingleUserWordEvent
-import com.bokadev.word_takes.presentation.single_user.SingleUserWordsViewModel
+import com.bokadev.word_takes.presentation.home.WordAllRatingsBottomSheet
+import com.bokadev.word_takes.presentation.home.WordCard
 import kotlinx.coroutines.flow.distinctUntilChanged
 import llc.amplitudo.cerovo.ui.theme.WordTakesTheme
 import org.koin.compose.viewmodel.koinViewModel
@@ -109,52 +110,68 @@ fun SingleUserWordsScreen(
         )
     }
 
-    LazyColumn(
-        state = listState,
-        modifier = Modifier.fillMaxSize()
-            .background(WordTakesTheme.colors.backgroundPrimary)
-            .padding(horizontal = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp, alignment = Alignment.Top),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        contentPadding = PaddingValues(bottom = 100.dp)
-    ) {
-        item {
-            Spacer(modifier = Modifier.height(50.dp))
-        }
-
-        val decideText = if(state.currentUserId == state.items.firstOrNull()?.user?.id) "Your takes" else
-            "${state.items.firstOrNull()?.user?.name}'s takes"
-        item {
+    if (state.items.isEmpty()) {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxSize()
+                .background(WordTakesTheme.colors.backgroundPrimary)
+                .padding(horizontal = 20.dp),
+        ) {
             Text(
-                text = decideText,
+                "You have no takes yet",
                 color = WordTakesTheme.colors.wordTakesWhite,
                 style = WordTakesTheme.typogrpahy.geistSemiBold32
             )
         }
+    } else
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.fillMaxSize()
+                .background(WordTakesTheme.colors.backgroundPrimary)
+                .padding(horizontal = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp, alignment = Alignment.Top),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            contentPadding = PaddingValues(bottom = 100.dp)
+        ) {
+            item {
+                Spacer(modifier = Modifier.height(50.dp))
+            }
 
-        items(state.items) { word ->
-            WordCard(
-                wordItem = word,
-                onRateClick = {
-                    viewModel.onEvent(
-                        SingleUserWordEvent.OnRateWordClick(
-                            wordId = word.id,
-                            reaction = it
-                        )
-                    )
-                },
-                onUserNameClick = {
+            val decideText =
+                if (state.currentUserId == state.items.firstOrNull()?.user?.id) "Your takes" else
+                    "${state.items.firstOrNull()?.user?.name}'s takes"
+            item {
+                Text(
+                    text = decideText,
+                    color = WordTakesTheme.colors.wordTakesWhite,
+                    style = WordTakesTheme.typogrpahy.geistSemiBold32
+                )
+            }
 
-                },
-                onSeeRatingsClick = { wordId, word ->
-                    viewModel.onEvent(
-                        SingleUserWordEvent.OpenBottomSheet(
-                            wordId = wordId,
-                            selectedWord = word
+            items(state.items) { word ->
+                WordCard(
+                    wordItem = word,
+                    onRateClick = {
+                        viewModel.onEvent(
+                            SingleUserWordEvent.OnRateWordClick(
+                                wordId = word.id,
+                                reaction = it
+                            )
                         )
-                    )
-                }
-            )
+                    },
+                    onUserNameClick = {
+
+                    },
+                    onSeeRatingsClick = { wordId, word ->
+                        viewModel.onEvent(
+                            SingleUserWordEvent.OpenBottomSheet(
+                                wordId = wordId,
+                                selectedWord = word
+                            )
+                        )
+                    }
+                )
+            }
         }
-    }
 }
