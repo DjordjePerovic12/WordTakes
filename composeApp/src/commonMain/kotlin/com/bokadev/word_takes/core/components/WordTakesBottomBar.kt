@@ -113,7 +113,7 @@ private fun BarIcon(
         modifier = modifier
             .size(36.dp)
             .noRippleClickable {
-                if (!isSelected || selected == 0 || selected == 1 || selected == 4)
+                if (!isSelected)
                     onSelect(index)
             }
     )
